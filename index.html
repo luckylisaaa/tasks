@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICS 專案執行清單｜Task Checklist</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#A51820">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #A51820;
+  --primary-deep: #7A1018;
+  --primary-bright: #C02030;
+  --bg: #FDFBF8;
+  --bg-card: #F4F1EC;
+  --bg-accent: #FAE8EA;
+  --bg-hero: #FDF3F4;
+  --text: #2A1A1C;
+  --text-2: #7A5A5E;
+  --text-3: #B09498;
+  --line: #E8E3DA;
+  --gold: #D4A574;
+  --done: #4A7C59;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Noto Sans TC", -apple-system, sans-serif;
+  line-height: 1.7;
+  padding-bottom: 80px;
+}
+.serif { font-family: "Noto Serif TC", serif; }
+
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 48px 24px 32px;
+  background: linear-gradient(135deg, var(--bg-hero), var(--bg));
+  border-bottom: 1px solid var(--line);
+  position: relative;
+}
+.hero-badge {
+  display: inline-block;
+  background: var(--primary);
+  color: #fff;
+  padding: 6px 18px;
+  border-radius: 2px;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 3px;
+  margin-bottom: 16px;
+}
+.hero h1 {
+  font-family: "Noto Serif TC", serif;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+.hero .sub {
+  color: var(--text-2);
+  font-size: 14px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* Info blocks: 電腦資料夾說明 + Firebase + Icon 規則 */
+.info-block {
+  max-width: 900px;
+  margin: 32px auto 0;
+  padding: 0 24px;
+}
+.info-details {
+  background: var(--bg-card);
+  border-radius: 6px;
+  margin-bottom: 10px;
+  border: 1px solid var(--line);
+  overflow: hidden;
+  transition: all 0.2s;
+}
+.info-details[open] {
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px rgba(165, 24, 32, 0.08);
+}
+.info-details summary {
+  padding: 14px 20px;
+  font-family: "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+.info-details summary::-webkit-details-marker { display: none; }
+.info-details summary::after {
+  content: "▼";
+  margin-left: auto;
+  color: var(--text-3);
+  font-size: 11px;
+  transition: transform 0.2s;
+}
+.info-details[open] summary::after { transform: rotate(180deg); }
+.info-details summary:hover { background: var(--bg-accent); }
+.info-body {
+  padding: 0 20px 20px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text);
+}
+.info-body p { margin-bottom: 10px; }
+.info-body ul { padding-left: 20px; margin-bottom: 10px; }
+.info-body li { padding: 2px 0; }
+.info-body code {
+  font-family: "JetBrains Mono", monospace;
+  background: var(--bg);
+  padding: 1px 6px;
+  border-radius: 2px;
+  font-size: 11px;
+  color: var(--primary);
+}
+.folder-tree {
+  background: var(--text);
+  color: #FDFBF8;
+  padding: 16px 20px;
+  border-radius: 4px;
+  margin: 12px 0;
+  overflow-x: auto;
+}
+.folder-tree pre {
+  font-family: "JetBrains Mono", "Courier New", monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  white-space: pre;
+  color: #FDFBF8;
+  margin: 0;
+}
+.tip-callout {
+  background: var(--bg-accent);
+  border-left: 3px solid var(--primary);
+  padding: 10px 14px;
+  border-radius: 0 4px 4px 0;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--primary-deep);
+  line-height: 1.7;
+}
+.tip-callout strong { color: var(--primary); }
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 12px;
+  background: var(--bg);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+.compare-table th, .compare-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+.compare-table th {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+.compare-table tr:last-child td { border-bottom: none; }
+.icon-example-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 14px 0;
+}
+.icon-item {
+  text-align: center;
+  font-size: 10px;
+  color: var(--text-2);
+}
+.mini-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #B51E28, #7A1018);
+  color: #fff;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Noto Serif TC", serif;
+  font-weight: 900;
+  font-size: 20px;
+  margin-bottom: 4px;
+  box-shadow: 0 4px 10px rgba(165, 24, 32, 0.2);
+}
+.progress-overall {
+  max-width: 800px;
+  margin: 24px auto 0;
+  padding: 0 24px;
+}
+.progress-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+.progress-label {
+  color: var(--text-2);
+  font-weight: 700;
+}
+.progress-percent {
+  font-family: "Noto Serif TC", serif;
+  color: var(--primary);
+  font-size: 24px;
+  font-weight: 900;
+}
+.progress-bar {
+  height: 8px;
+  background: var(--bg-card);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--primary-bright));
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+/* Toolbar */
+.toolbar {
+  background: var(--bg-card);
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+}
+.toolbar-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.filter-btn {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--text-2);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.filter-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.filter-btn:hover:not(.active) { background: var(--bg); }
+.spacer { flex: 1; }
+.action-btn {
+  background: var(--text);
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.2s;
+}
+.action-btn:hover { opacity: 0.85; }
+.action-btn.primary { background: var(--primary); }
+
+/* Main */
+.wrap { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+
+.phase {
+  margin-bottom: 32px;
+}
+.phase-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border-left: 4px solid var(--primary);
+  border-radius: 4px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.phase-header:hover { background: #EDE8E0; }
+.phase-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.phase-num {
+  font-family: "Noto Serif TC", serif;
+  font-weight: 900;
+  font-size: 20px;
+  color: var(--primary);
+  min-width: 32px;
+}
+.phase-title {
+  font-family: "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: 18px;
+}
+.phase-sub {
+  color: var(--text-2);
+  font-size: 12px;
+  margin-left: 8px;
+}
+.phase-count {
+  background: var(--primary);
+  color: #fff;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.phase-count.done { background: var(--done); }
+.phase-toggle {
+  color: var(--text-3);
+  font-size: 14px;
+  transition: transform 0.2s;
+  margin-left: 8px;
+}
+.phase.collapsed .phase-toggle { transform: rotate(-90deg); }
+.phase.collapsed .tasks { display: none; }
+
+.tasks { padding-left: 8px; }
+
+.task {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  transition: background 0.15s;
+  border-left: 3px solid transparent;
+}
+.task:hover { background: var(--bg-card); }
+.task.done {
+  opacity: 0.55;
+  border-left-color: var(--done);
+  background: rgba(74, 124, 89, 0.04);
+}
+.task.done .task-title {
+  text-decoration: line-through;
+  color: var(--text-2);
+}
+
+.task-check {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--line);
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  margin-top: 2px;
+  background: var(--bg);
+}
+.task-check:hover { border-color: var(--primary); }
+.task.done .task-check {
+  background: var(--done);
+  border-color: var(--done);
+}
+.task.done .task-check::after {
+  content: "✓";
+  color: #fff;
+  font-weight: 900;
+  font-size: 14px;
+}
+
+.task-body { flex: 1; }
+.task-title {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 500;
+  line-height: 1.6;
+}
+.task-desc {
+  font-size: 12px;
+  color: var(--text-2);
+  margin-top: 3px;
+  line-height: 1.5;
+}
+.task-tag {
+  display: inline-block;
+  background: var(--bg-accent);
+  color: var(--primary-deep);
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  margin-right: 4px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.task-tag.p0 { background: #FEE; color: #C02030; }
+.task-tag.p1 { background: #FFF4E0; color: #D4A574; }
+.task-tag.p2 { background: #E8F0FE; color: #1A73E8; }
+.task-tag.p3 { background: #E8F5E9; color: #4A7C59; }
+.task-tag.habit { background: #F4E8FE; color: #8B5CF6; }
+
+/* Progress sharing box */
+.share-box {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--text);
+  color: #fff;
+  padding: 12px 24px;
+  z-index: 100;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+  display: none;
+}
+.share-box.show { display: block; }
+.share-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.share-box .label {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-bottom: 4px;
+}
+.share-box .text {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  background: rgba(255,255,255,0.08);
+  padding: 8px 12px;
+  border-radius: 3px;
+  max-width: 560px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.share-box button {
+  background: var(--primary-bright);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+}
+
+/* Highlight next task */
+.task.next-todo {
+  border-left-color: var(--primary);
+  background: var(--bg-hero);
+  position: relative;
+}
+.task.next-todo::before {
+  content: "👉 下一步";
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: var(--primary);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+/* Empty state */
+.empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-3);
+  font-size: 14px;
+}
+
+/* Last updated */
+.footer {
+  text-align: center;
+  padding: 32px 20px;
+  color: var(--text-3);
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+.footer .brand {
+  font-family: "Noto Serif TC", serif;
+  color: var(--primary);
+  font-weight: 700;
+  letter-spacing: 3px;
+  margin-bottom: 6px;
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">ICS PROJECT · TASK BOARD</div>
+  <h1 class="serif">專案執行清單</h1>
+  <div class="sub">勾選你已完成的任務 · 系統自動保存 · 隨時回來都能繼續</div>
+</div>
+
+<!-- Quick Help Section: 放哪 / Firebase / Icon -->
+<div class="info-block">
+  <details class="info-details">
+    <summary>📁 電腦資料夾要放哪裡？（點我展開）</summary>
+    <div class="info-body">
+      <p><strong>推薦位置：iCloud Drive 或 Google Drive 裡</strong>（自動雲端同步，電腦壞了不怕）</p>
+      <div class="folder-tree">
+<pre>📁 iCloud Drive（或 Google Drive）
+  └── 📁 ICS 品牌專案/ ⬅ 主資料夾放這裡
+        │
+        ├── 📁 00_網站上線檔/ ★核心★
+        │   ├── 📁 Site_1_Handbook_學習手冊/
+        │   ├── 📁 Site_2_Scripts_腳本產生器/
+        │   ├── 📁 Site_3_Matrix_選題矩陣/
+        │   ├── 📁 Site_4_Brand_品牌規範書/
+        │   ├── 📁 Site_5_Home_總入口頁/
+        │   ├── 📁 Site_6_Tasks_執行清單/ ⭐ 新
+        │   └── 📁 Shared_共用素材/
+        │       ├── Icons_圖示/
+        │       │   ├── ICS_主Logo/
+        │       │   ├── H_Handbook/
+        │       │   ├── M_Matrix/
+        │       │   ├── S_Scripts/
+        │       │   ├── B_Brand/
+        │       │   └── T_Tasks/ ⭐ 新
+        │       ├── Colors_色票/
+        │       └── Logos_標誌/
+        │
+        ├── 📁 00B_Astra個人軌資產/ ← Astra 分開管理
+        │
+        ├── 📁 01_重大里程碑備份/
+        │   └── 2026-04-23_V1_42格版本/
+        │
+        ├── 📁 02_原始素材/ ← Claude 給的 ZIP 原檔
+        │   └── 從Claude下載_20260423/
+        │
+        ├── 📁 03_決策日誌/
+        │   └── DECISIONS.md
+        │
+        └── 📁 04_創業SOP手冊/
+            └── STARTUP_SOP.md</pre>
+      </div>
+      <div class="tip-callout">
+        💡 <strong>觀念</strong>：電腦資料夾放「正在用的檔案」；GitHub 自動保存所有歷史版本；iCloud/Google Drive 自動跨裝置同步。三層備份，你什麼都不用手動做。
+      </div>
+    </div>
+  </details>
+
+  <details class="info-details">
+    <summary>🔥 Firebase 需要嗎？（點我展開）</summary>
+    <div class="info-body">
+      <p><strong>答案：現在不需要。</strong></p>
+      <table class="compare-table">
+        <tr><th>功能</th><th>GitHub Pages（你在用）</th><th>Firebase</th></tr>
+        <tr><td>網站託管</td><td>✓ 免費</td><td>✓ 免費</td></tr>
+        <tr><td>跨裝置使用</td><td>✓ 網址統一</td><td>✓ 網址統一</td></tr>
+        <tr><td>資料庫</td><td>✗ 沒有</td><td>✓ 有</td></tr>
+        <tr><td>登入系統</td><td>✗ 沒有</td><td>✓ 有</td></tr>
+        <tr><td>學習難度</td><td>簡單</td><td>中等</td></tr>
+      </table>
+      <p><strong>什麼時候會用到 Firebase？</strong></p>
+      <ul>
+        <li>要做「客戶登入自己的 Portal」</li>
+        <li>要「多人協作編輯」</li>
+        <li>要「跨裝置同步清單進度」</li>
+      </ul>
+      <p>這些都是未來 3-6 個月後才需要的功能。現在用 GitHub Pages 完全夠。</p>
+      <div class="tip-callout">
+        💡 <strong>你的清單進度</strong>現在存在瀏覽器的 localStorage 裡，同一個瀏覽器就能保存。未來要跨裝置同步進度時，再用 Firebase。
+      </div>
+    </div>
+  </details>
+
+  <details class="info-details">
+    <summary>🎨 未來新增工具的 Icon 規則（點我展開）</summary>
+    <div class="info-body">
+      <p><strong>每次新增一個工具，都要有一個專屬 Icon。規則：</strong></p>
+      <ul>
+        <li>底色：深玫瑰紅漸層 <code>#B51E28 → #7A1018</code></li>
+        <li>字母：工具英文名首字母（Noto Serif TC 白色）</li>
+        <li>裝飾：金線 <code>#D4A574</code> + 工具英文名 uppercase</li>
+        <li>尺寸：32 / 180 / 192 / 512 PNG + SVG</li>
+        <li>圓角：22%（112/512）</li>
+      </ul>
+      <p><strong>現有系列：</strong></p>
+      <div class="icon-example-row">
+        <div class="icon-item"><div class="mini-icon">ICS</div><div>主 Logo</div></div>
+        <div class="icon-item"><div class="mini-icon">H</div><div>Handbook</div></div>
+        <div class="icon-item"><div class="mini-icon">M</div><div>Matrix</div></div>
+        <div class="icon-item"><div class="mini-icon">S</div><div>Scripts</div></div>
+        <div class="icon-item"><div class="mini-icon">B</div><div>Brand</div></div>
+        <div class="icon-item"><div class="mini-icon">T</div><div>Tasks ⭐</div></div>
+      </div>
+      <div class="tip-callout">
+        💡 <strong>未來新增</strong>：Portal = P、Report = R、Academy = A... 依此類推。跟 Claude 說「幫我做 X 工具的 icon」即可。
+      </div>
+    </div>
+  </details>
+</div>
+
+<!-- Progress -->
+<div class="progress-overall">
+  <div class="progress-stats">
+    <span class="progress-label">整體進度</span>
+    <span class="progress-percent" id="percent">0%</span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+  </div>
+  <div class="progress-stats" style="margin-top: 6px;">
+    <span style="color: var(--text-3); font-size: 11px;" id="statText">0 / 0 已完成</span>
+    <span style="color: var(--text-3); font-size: 11px;" id="lastUpdate"></span>
+  </div>
+</div>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <div class="toolbar-inner">
+    <button class="filter-btn active" data-filter="all">全部</button>
+    <button class="filter-btn" data-filter="todo">未完成</button>
+    <button class="filter-btn" data-filter="done">已完成</button>
+    <button class="filter-btn" data-filter="p0">🔥 P0 今天</button>
+    <button class="filter-btn" data-filter="p1">⭐ P1 本週</button>
+    <button class="filter-btn" data-filter="p2">📅 P2 本月</button>
+    <button class="filter-btn" data-filter="habit">🔄 習慣</button>
+    <div class="spacer"></div>
+    <button class="action-btn" onclick="toggleShareBox()">📋 複製進度給 AI</button>
+    <button class="action-btn" onclick="exportProgress()">💾 匯出</button>
+  </div>
+</div>
+
+<div class="wrap" id="wrap"></div>
+
+<!-- Share box -->
+<div class="share-box" id="shareBox">
+  <div class="share-inner">
+    <div style="flex:1;">
+      <div class="label">📋 把這段複製給 AI 就知道你的進度</div>
+      <div class="text" id="shareText"></div>
+    </div>
+    <button onclick="copyShareText()">複製</button>
+    <button onclick="toggleShareBox()" style="background: transparent; border: 1px solid rgba(255,255,255,0.3);">關閉</button>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="brand">INSPIRE · CREATE · SHINE</div>
+  <div>ICS 專案執行清單 V1.0 · 2026/04/23</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// 任務資料
+// ═══════════════════════════════════════════════
+const TASKS = [
+  // ─── 階段 1：今天核心任務（P0）─────────
+  {
+    phase: "今天必做", phaseIcon: "🔥", phaseDesc: "Priority 0 · 完成就能用",
+    items: [
+      { id: "p0-1", title: "解壓 3_MATRIX_42cards ZIP 到 Site_3_Matrix 資料夾", desc: "覆蓋舊的 28 格版本（GitHub 會自動備份舊版，不用擔心）", tags: ["p0"] },
+      { id: "p0-2", title: "上傳 Matrix 42 格到 GitHub（覆蓋舊版）", desc: "Commit message：[FEAT] 新增容器③選立場14格｜Add container 3 (14 cards)", tags: ["p0"] },
+      { id: "p0-3", title: "解壓 2_BRAND_V3 ZIP 到 Site_4_Brand 資料夾", desc: "V3 新增錨點導覽 + 回頂按鈕", tags: ["p0"] },
+      { id: "p0-4", title: "上傳品牌規範書 V3 到 GitHub（覆蓋 V2）", desc: "Commit message：[FEAT] 品牌規範書V3加入錨點導覽｜Brand guidelines V3 with anchor nav", tags: ["p0"] },
+      { id: "p0-5", title: "解壓 1_總入口頁 ZIP 到 Site_5_Home 資料夾", desc: "含 index.html + manifest + 5 個 icon", tags: ["p0"] },
+      { id: "p0-6", title: "建立新 GitHub repo 名稱為 luckylisaaa.github.io", desc: "特殊名稱 = 會變成你的根網址首頁", tags: ["p0"] },
+      { id: "p0-7", title: "上傳總入口頁所有 7 個檔案到新 repo", desc: "Commit message：[FEAT] 建立ICS品牌總入口頁｜Create ICS brand portal", tags: ["p0"] },
+      { id: "p0-8", title: "啟動 GitHub Pages（Settings → Pages → main / root → Save）", desc: "等 1-2 分鐘拿到網址 luckylisaaa.github.io/", tags: ["p0"] },
+      { id: "p0-9", title: "手機 Safari 打開 luckylisaaa.github.io 並加到主畫面", desc: "ICS 品牌 icon 出現在手機桌面", tags: ["p0"] },
+    ]
+  },
+  // ─── 階段 2：資料夾整理 ─────────
+  {
+    phase: "電腦資料夾整理", phaseIcon: "📁", phaseDesc: "建立六大架構",
+    items: [
+      { id: "fs-1", title: "建立主資料夾「ICS 品牌專案」", tags: ["p0"] },
+      { id: "fs-2", title: "建立 00_網站上線檔/（5 個 Site 子資料夾 + Shared）", tags: ["p0"] },
+      { id: "fs-3", title: "建立 00B_Astra個人軌資產/（把 Astra 檔案搬進來）", tags: ["p1"] },
+      { id: "fs-4", title: "建立 01_重大里程碑備份/", desc: "只在大版本改變時才備份（GitHub 自動有歷史）", tags: ["p1"] },
+      { id: "fs-5", title: "建立 02_原始素材/ 存放 Claude 給的 ZIP 原檔", tags: ["p1"] },
+      { id: "fs-6", title: "建立 03_決策日誌/ 放 DECISIONS.md（我給的 ZIP 5）", tags: ["p0"] },
+      { id: "fs-7", title: "建立 04_創業SOP手冊/ 放 STARTUP_SOP.md（我給的 ZIP 6）", tags: ["p0"] },
+      { id: "fs-8", title: "把 Site_1_Handbook 裡的 70 個舊版本 HTML 刪除或搬到 Archive", desc: "GitHub 都有歷史，電腦不用留", tags: ["p1"] },
+    ]
+  },
+  // ─── 階段 3：三網站互相導覽 ─────────
+  {
+    phase: "三網站互相導覽", phaseIcon: "🔗", phaseDesc: "讓每個工具都能跳到另外的",
+    items: [
+      { id: "nav-1", title: "打開 ICS導覽浮動按鈕_貼到每個網站.html 複製全部內容", tags: ["p1"] },
+      { id: "nav-2", title: "編輯 GitHub handbook 的 index.html，在 </body> 前貼上", desc: "Commit message：[FEAT] 加入ICS浮動導覽｜Add ICS floating nav", tags: ["p1"] },
+      { id: "nav-3", title: "編輯 GitHub script-generator 的 index.html，在 </body> 前貼上", desc: "Commit message：[FEAT] 加入ICS浮動導覽｜Add ICS floating nav", tags: ["p1"] },
+      { id: "nav-4", title: "驗證五個網站右下角都有紅色圓形浮動按鈕", desc: "handbook / matrix / scripts / brand / home", tags: ["p1"] },
+    ]
+  },
+  // ─── 階段 4：矩陣內容擴充 ─────────
+  {
+    phase: "矩陣內容擴充", phaseIcon: "📖", phaseDesc: "從 42 格到 112 格完整版",
+    items: [
+      { id: "mx-3", title: "✅ 已完成：容器 ③ 選立場 14 格", tags: ["p0"], auto_done: true },
+      { id: "mx-4", title: "容器 ④ 教知識 14 格", desc: "跟 Claude 要第 4 批（告訴它：繼續矩陣第 4 批｜容器④教知識）", tags: ["p1"] },
+      { id: "mx-5", title: "容器 ⑤ 熬情緒 14 格", tags: ["p1"] },
+      { id: "mx-6", title: "容器 ⑥ 演劇情 14 格", tags: ["p1"] },
+      { id: "mx-7", title: "容器 ⑦ 賣產品 14 格", tags: ["p1"] },
+      { id: "mx-8", title: "容器 ⑧ 破圈挑戰 ★ 14 格", tags: ["p1"] },
+      { id: "mx-done", title: "🎉 112 格完整版達成", desc: "品牌里程碑！記得到 01_重大里程碑備份/ 存一份", tags: ["p1"] },
+    ]
+  },
+  // ─── 階段 5：PWA 全網站升級 ─────────
+  {
+    phase: "PWA 全網站升級", phaseIcon: "📱", phaseDesc: "所有網站都變成可安裝 App",
+    items: [
+      { id: "pwa-1", title: "✅ 已完成：Matrix 升級為 PWA", tags: [], auto_done: true },
+      { id: "pwa-2", title: "Handbook 升級為 PWA", desc: "跟 Claude 要 PWA 升級包", tags: ["p1"] },
+      { id: "pwa-3", title: "Scripts 升級為 PWA", tags: ["p1"] },
+      { id: "pwa-4", title: "Brand Guidelines 升級為 PWA", tags: ["p1"] },
+      { id: "pwa-5", title: "Home 升級為 PWA", desc: "manifest.json 已準備好，只缺 sw.js", tags: ["p1"] },
+    ]
+  },
+  // ─── 階段 6：重大決策紀錄 ─────────
+  {
+    phase: "決策日誌系統", phaseIcon: "📝", phaseDesc: "記錄重要決定背後的思考",
+    items: [
+      { id: "dec-1", title: "打開 DECISIONS.md 讀過一次（我已幫你寫了 10 個決策）", tags: ["p0"] },
+      { id: "dec-2", title: "未來每個重大決策都寫一條（遵循模板格式）", tags: ["habit"] },
+      { id: "dec-3", title: "每月整理一次決策日誌（看過去 30 天做了什麼）", tags: ["habit"] },
+    ]
+  },
+  // ─── 階段 7：創業 SOP 累積 ─────────
+  {
+    phase: "創業 SOP 手冊", phaseIcon: "📕", phaseDesc: "把經驗變成可複製的流程",
+    items: [
+      { id: "sop-1", title: "打開 STARTUP_SOP.md 讀過一次（我已幫你寫了 V1.0）", tags: ["p0"] },
+      { id: "sop-2", title: "完成每個階段後，回來更新 SOP（加入踩過的坑、優化點）", tags: ["habit"] },
+      { id: "sop-3", title: "112 格矩陣完成後，大幅更新 SOP V2.0", tags: ["p1"] },
+      { id: "sop-4", title: "未來開新事業（例如股票事業），複製這份 SOP 執行", tags: ["p3"] },
+    ]
+  },
+  // ─── 階段 8：習慣養成 ─────────
+  {
+    phase: "日常習慣養成", phaseIcon: "🔄", phaseDesc: "每次操作都遵守這些原則",
+    items: [
+      { id: "h-1", title: "每次 commit 都用標準格式：[類別] 中文｜English description", desc: "FEAT 新增｜FIX 修正｜STYLE 樣式｜DOCS 文件｜REFACTOR 重構", tags: ["habit"] },
+      { id: "h-2", title: "遇到重大決策就記 DECISIONS.md", desc: "記錄：做了什麼 / 為什麼 / 替代方案", tags: ["habit"] },
+      { id: "h-3", title: "每週五回來這份清單檢查進度並更新", tags: ["habit"] },
+      { id: "h-4", title: "每次中斷工作前，點「複製進度給 AI」存一份", desc: "下次回來貼給 AI 它就知道你做到哪", tags: ["habit"] },
+    ]
+  },
+  // ─── 階段 9：中期規劃 ─────────
+  {
+    phase: "中期規劃（1-3 個月）", phaseIcon: "📅", phaseDesc: "當下不急，記著就好",
+    items: [
+      { id: "m-1", title: "建立對外提案簡報（PDF / Keynote）", tags: ["p2"] },
+      { id: "m-2", title: "建立客戶案例展示頁", tags: ["p2"] },
+      { id: "m-3", title: "報價單精美版（客戶版 PDF）", tags: ["p2"] },
+      { id: "m-4", title: "合約範本對齊律師審閱", tags: ["p2"] },
+      { id: "m-5", title: "買品牌網域（inspirecreateshine.com 或類似）", tags: ["p2"] },
+      { id: "m-6", title: "搬家：GitHub → 自有網域 + 子網域規劃", tags: ["p2"] },
+      { id: "m-7", title: "Google Analytics 安裝到所有網站", tags: ["p2"] },
+      { id: "m-8", title: "名片設計（實體 + 電子簽名檔）", tags: ["p2"] },
+    ]
+  },
+  // ─── 階段 10：長期願景 ─────────
+  {
+    phase: "長期願景（3-12 個月）", phaseIcon: "🚀", phaseDesc: "不要現在做，但方向先在",
+    items: [
+      { id: "l-1", title: "接下 1-3 個正式客戶（驗證商業模式）", tags: ["p3"] },
+      { id: "l-2", title: "建立客戶 Portal（每客戶自己的儀表板）", tags: ["p3"] },
+      { id: "l-3", title: "把方法論變成線上課程 / 訂閱制", tags: ["p3"] },
+      { id: "l-4", title: "付費 Google Drive 200GB（有客戶資料時）", tags: ["p3"] },
+      { id: "l-5", title: "外接硬碟大備份（半年週期）", tags: ["p3"] },
+      { id: "l-6", title: "用 ICS 的 SOP 開新事業（股票 / 其他產品線）", tags: ["p3"] },
+    ]
+  },
+];
+
+// ═══════════════════════════════════════════════
+// 初始化
+// ═══════════════════════════════════════════════
+const STORAGE_KEY = "ics-tasks-v1";
+let state = { done: {}, updated: null };
+
+function loadState() {
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    if (s) state = JSON.parse(s);
+  } catch(e) {}
+  // Apply auto_done
+  TASKS.forEach(ph => ph.items.forEach(t => {
+    if (t.auto_done && !(t.id in state.done)) state.done[t.id] = true;
+  }));
+}
+
+function saveState() {
+  state.updated = new Date().toISOString();
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function toggleTask(id) {
+  state.done[id] = !state.done[id];
+  saveState();
+  render();
+}
+
+let currentFilter = "all";
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll(".filter-btn").forEach(b => {
+    b.classList.toggle("active", b.dataset.filter === f);
+  });
+  render();
+}
+
+function passesFilter(task, phaseName) {
+  if (currentFilter === "all") return true;
+  if (currentFilter === "todo") return !state.done[task.id];
+  if (currentFilter === "done") return state.done[task.id];
+  return task.tags && task.tags.includes(currentFilter);
+}
+
+function togglePhase(idx) {
+  const el = document.querySelector(`[data-phase-idx="${idx}"]`);
+  if (el) el.classList.toggle("collapsed");
+}
+
+function findNextTodo() {
+  for (const ph of TASKS) {
+    for (const t of ph.items) {
+      if (!state.done[t.id] && t.tags && t.tags.includes("p0")) return t.id;
+    }
+  }
+  for (const ph of TASKS) {
+    for (const t of ph.items) {
+      if (!state.done[t.id]) return t.id;
+    }
+  }
+  return null;
+}
+
+function render() {
+  const wrap = document.getElementById("wrap");
+  wrap.innerHTML = "";
+  const nextTodo = findNextTodo();
+  let total = 0, done = 0;
+
+  TASKS.forEach((ph, phaseIdx) => {
+    const visibleItems = ph.items.filter(t => passesFilter(t, ph.phase));
+    if (visibleItems.length === 0 && currentFilter !== "all") return;
+    const phaseTotal = ph.items.length;
+    const phaseDone = ph.items.filter(t => state.done[t.id]).length;
+    total += phaseTotal;
+    done += phaseDone;
+
+    const phaseEl = document.createElement("div");
+    phaseEl.className = "phase";
+    phaseEl.dataset.phaseIdx = phaseIdx;
+
+    const allDone = phaseDone === phaseTotal && phaseTotal > 0;
+    phaseEl.innerHTML = `
+      <div class="phase-header" onclick="togglePhase(${phaseIdx})">
+        <div class="phase-info">
+          <div class="phase-num">${ph.phaseIcon}</div>
+          <div>
+            <div class="phase-title">${ph.phase}</div>
+            <div class="phase-sub">${ph.phaseDesc || ""}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="phase-count ${allDone ? 'done' : ''}">${phaseDone} / ${phaseTotal}</div>
+          <span class="phase-toggle">▼</span>
+        </div>
+      </div>
+      <div class="tasks"></div>
+    `;
+
+    const tasksEl = phaseEl.querySelector(".tasks");
+    visibleItems.forEach(t => {
+      const isDone = state.done[t.id];
+      const isNext = t.id === nextTodo;
+      const taskEl = document.createElement("div");
+      taskEl.className = "task" + (isDone ? " done" : "") + (isNext && !isDone ? " next-todo" : "");
+      taskEl.onclick = (e) => {
+        if (e.target.tagName === "A") return;
+        toggleTask(t.id);
+      };
+      const tags = (t.tags || []).map(tag => {
+        const labels = { p0: "🔥 今天", p1: "⭐ 本週", p2: "📅 中期", p3: "🚀 長期", habit: "🔄 習慣" };
+        return labels[tag] ? `<span class="task-tag ${tag}">${labels[tag]}</span>` : "";
+      }).join("");
+      taskEl.innerHTML = `
+        <div class="task-check"></div>
+        <div class="task-body">
+          <div>${tags}<span class="task-title">${t.title}</span></div>
+          ${t.desc ? `<div class="task-desc">${t.desc}</div>` : ""}
+        </div>
+      `;
+      tasksEl.appendChild(taskEl);
+    });
+
+    wrap.appendChild(phaseEl);
+  });
+
+  // Progress
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById("percent").textContent = pct + "%";
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("statText").textContent = `${done} / ${total} 已完成`;
+  const upd = state.updated ? new Date(state.updated) : null;
+  document.getElementById("lastUpdate").textContent = upd ? "最後更新：" + upd.toLocaleString("zh-TW") : "";
+
+  if (total > 0 && done === 0 && currentFilter !== "all") {
+    wrap.innerHTML = `<div class="empty">這個分類沒有任務或都已完成 🎉</div>`;
+  }
+}
+
+// Filter binding
+document.querySelectorAll(".filter-btn").forEach(b => {
+  b.addEventListener("click", () => setFilter(b.dataset.filter));
+});
+
+// ═══════════════════════════════════════════════
+// Share progress to AI
+// ═══════════════════════════════════════════════
+function buildShareText() {
+  const lines = [];
+  lines.push("【我的 ICS 專案進度彙報】");
+  lines.push("");
+  let total = 0, done = 0;
+  TASKS.forEach(ph => {
+    const phTotal = ph.items.length;
+    const phDone = ph.items.filter(t => state.done[t.id]).length;
+    total += phTotal; done += phDone;
+    lines.push(`${ph.phaseIcon} ${ph.phase}：${phDone}/${phTotal}`);
+    const notDone = ph.items.filter(t => !state.done[t.id]);
+    if (notDone.length > 0) {
+      notDone.slice(0, 3).forEach(t => {
+        lines.push(`  □ ${t.title}`);
+      });
+      if (notDone.length > 3) lines.push(`  ... 還有 ${notDone.length - 3} 項未完成`);
+    }
+  });
+  lines.push("");
+  lines.push(`整體進度：${done}/${total} (${Math.round(done/total*100)}%)`);
+  lines.push(`更新時間：${new Date().toLocaleString("zh-TW")}`);
+  lines.push("");
+  lines.push("---");
+  lines.push("基於以上進度，請建議我下一步做什麼。");
+  return lines.join("\n");
+}
+
+function toggleShareBox() {
+  const box = document.getElementById("shareBox");
+  if (box.classList.contains("show")) {
+    box.classList.remove("show");
+  } else {
+    document.getElementById("shareText").textContent = buildShareText();
+    box.classList.add("show");
+  }
+}
+
+function copyShareText() {
+  const text = buildShareText();
+  navigator.clipboard.writeText(text).then(() => {
+    alert("✓ 已複製！去貼給 AI 就能知道你的進度");
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    alert("✓ 已複製！");
+  });
+}
+
+function exportProgress() {
+  const text = buildShareText();
+  const blob = new Blob([text], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `ICS進度_${new Date().toISOString().slice(0,10)}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Expose globals
+window.togglePhase = togglePhase;
+window.toggleShareBox = toggleShareBox;
+window.copyShareText = copyShareText;
+window.exportProgress = exportProgress;
+
+// Init
+loadState();
+render();
+</script>
+</body>
+</html>

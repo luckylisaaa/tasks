@@ -1,0 +1,16 @@
+{
+  "name": "ICS 專案執行清單",
+  "short_name": "ICS Tasks",
+  "description": "ICS 品牌專案執行清單 · 進度管理 · 隨時回報 AI",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FDFBF8",
+  "theme_color": "#A51820",
+  "lang": "zh-Hant",
+  "icons": [
+    { "src": "icon-tasks-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-tasks-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

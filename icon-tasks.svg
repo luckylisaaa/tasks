@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGradT" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#B51E28"/>
+      <stop offset="100%" stop-color="#7A1018"/>
+    </linearGradient>
+    <linearGradient id="goldLineT" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D4A574" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#E8C999" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#D4A574" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" ry="112" fill="url(#bgGradT)"/>
+  <!-- Checkbox motif -->
+  <g stroke="#FDFBF8" stroke-width="3" opacity="0.2" fill="none">
+    <rect x="100" y="120" width="40" height="40" rx="6"/>
+    <rect x="100" y="184" width="40" height="40" rx="6"/>
+    <path d="M 105 140 L 115 150 L 135 128" stroke-width="4"/>
+  </g>
+  <!-- Large T -->
+  <text x="256" y="310"
+        font-family="'Noto Serif TC', 'Times New Roman', serif"
+        font-size="260"
+        font-weight="900"
+        fill="#FDFBF8"
+        text-anchor="middle">T</text>
+  <line x1="180" y1="360" x2="332" y2="360" stroke="url(#goldLineT)" stroke-width="2"/>
+  <text x="256" y="400"
+        font-family="'Noto Serif TC', serif"
+        font-size="28"
+        font-weight="500"
+        fill="#FDFBF8"
+        text-anchor="middle"
+        letter-spacing="4"
+        opacity="0.85">TASKS</text>
+</svg>
