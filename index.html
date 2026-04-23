@@ -677,7 +677,7 @@ body {
 
 <div class="footer">
   <div class="brand">INSPIRE · CREATE · SHINE</div>
-  <div>ICS 專案執行清單 V1.0 · 2026/04/23</div>
+  <div>ICS 專案執行清單 V1.2 · 2026/04/23</div>
 </div>
 
 <script>
@@ -685,6 +685,40 @@ body {
 // 任務資料
 // ═══════════════════════════════════════════════
 const TASKS = [
+  // ─── 🏆 昨日戰績：2026/04/23 第一天 17 項里程碑 ─────────
+  {
+    phase: "昨日戰績 · 2026/04/23", phaseIcon: "🏆", phaseDesc: "第一天 17 項里程碑（全部自動打勾 · 紀念用）",
+    items: [
+      { id: "y23-1",  title: "✅ 建立 ICS 三層品牌架構（ICS × H/M/S/B/T）", tags: ["done"], auto_done: true },
+      { id: "y23-2",  title: "✅ 確立視覺系統（主色 #A51820 + Noto Serif TC + 微咖黑）", tags: ["done"], auto_done: true },
+      { id: "y23-3",  title: "✅ Icon 系列 6 款完成（ICS / H / M / S / B / T）", tags: ["done"], auto_done: true },
+      { id: "y23-4",  title: "✅ Matrix 升級為 PWA（可安裝為 App）", tags: ["done"], auto_done: true },
+      { id: "y23-5",  title: "✅ Matrix 從 28 格 → 42 格（新增容器③選立場 14 格）", tags: ["done"], auto_done: true },
+      { id: "y23-6",  title: "✅ 品牌規範書 V1 → V2 → V3（含錨點導覽 + 回頂 + Scroll Spy）", tags: ["done"], auto_done: true },
+      { id: "y23-7",  title: "✅ 總入口頁 luckylisaaa.github.io 上線（根網址）", tags: ["done"], auto_done: true },
+      { id: "y23-8",  title: "✅ Tasks 執行清單上線（PWA）", tags: ["done"], auto_done: true },
+      { id: "y23-9",  title: "✅ 六大資料夾架構建立", tags: ["done"], auto_done: true },
+      { id: "y23-10", title: "✅ Astra 個人軌獨立管理（00B 資料夾）", tags: ["done"], auto_done: true },
+      { id: "y23-11", title: "✅ 重大里程碑備份機制建立", tags: ["done"], auto_done: true },
+      { id: "y23-12", title: "✅ ZIP 原始素材全部歸檔到 02_原始素材/", tags: ["done"], auto_done: true },
+      { id: "y23-13", title: "✅ 學會 GitHub 版本控制觀念", tags: ["done"], auto_done: true },
+      { id: "y23-14", title: "✅ Commit Message 標準格式養成", tags: ["done"], auto_done: true },
+      { id: "y23-15", title: "✅ 手機桌面 ICS 三連裝（ICS / M / T icon）", tags: ["done"], auto_done: true },
+      { id: "y23-16", title: "✅ 決策日誌 V1 模板（10 條重大決策）", tags: ["done"], auto_done: true },
+      { id: "y23-17", title: "✅ 創業 SOP 手冊 V1 模板", tags: ["done"], auto_done: true },
+      { id: "y23-bonus", title: "✨ 超額達成：浮動導覽貼到 handbook + script-generator（六網站打通）", tags: ["done"], auto_done: true },
+    ]
+  },
+  // ─── 📋 今日收尾：2026/04/24 三件 P0 ─────────
+  {
+    phase: "今日收尾 · 2026/04/24", phaseIcon: "📋", phaseDesc: "接續昨天節奏的三件 P0 任務",
+    items: [
+      { id: "t24-1", title: "Tasks V1.2 上傳（覆蓋 tasks repo）", desc: "就是你現在看的這個版本！Commit message：[FEAT] Tasks清單V1.2更新今日戰績｜Tasks V1.2 with today achievements", tags: ["p0"] },
+      { id: "t24-2", title: "Matrix 56 格上傳（覆蓋 matrix repo）", desc: "新增容器 ④ 教知識 14 張作戰卡。先備份現在的 42 格版到 01_重大里程碑備份/，再覆蓋。Commit：[FEAT] 新增容器④教知識14格｜Add container 4 (14 cards)", tags: ["p0"] },
+      { id: "t24-3", title: "Handbook Build Log 更新（對內紀錄）", desc: "手動編輯 handbook/index.html，貼上 2026/04/23 的 17 項里程碑紀錄。Commit：[DOCS] 新增2026/04/23 Build Log｜Add Build Log entry", tags: ["p0"] },
+      { id: "t24-close", title: "🎯 今日三件收尾達成", desc: "完成後記得點右上角「複製進度給 AI」存一份，明天接著打 112 格矩陣", tags: ["p0"] },
+    ]
+  },
   // ─── 階段 1：今天核心任務（P0）─────────
   {
     phase: "今天必做", phaseIcon: "🔥", phaseDesc: "Priority 0 · 完成就能用",
