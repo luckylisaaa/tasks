@@ -1,1066 +1,721 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ICS 專案執行清單｜Task Checklist</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ICS Tasks｜專案執行清單 V2</title>
+<link rel="icon" type="image/svg+xml" href="icon-tasks.svg">
+<link rel="apple-touch-icon" href="icon-tasks-180.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#A51820">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <style>
-:root {
-  --primary: #A51820;
-  --primary-deep: #7A1018;
-  --primary-bright: #C02030;
-  --bg: #FDFBF8;
-  --bg-card: #F4F1EC;
-  --bg-accent: #FAE8EA;
-  --bg-hero: #FDF3F4;
-  --text: #2A1A1C;
-  --text-2: #7A5A5E;
-  --text-3: #B09498;
-  --line: #E8E3DA;
-  --gold: #D4A574;
-  --done: #4A7C59;
+:root{
+  --r1:#A51820; --r2:#7A1018; --r3:#C02030; --gold:#D4A574;
+  --bg:#FDFBF8; --card:#F4F1EC; --hero:#FDF3F4; --ai-hl:#FAE8EA;
+  --text:#2A1A1C; --muted:#7A5A5E; --light:#B09498; --border:#E8E3DA;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: "Noto Sans TC", -apple-system, sans-serif;
-  line-height: 1.7;
-  padding-bottom: 80px;
-}
-.serif { font-family: "Noto Serif TC", serif; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding-bottom:60px}
+.serif{font-family:'Noto Serif TC',serif}
+.mono{font-family:'JetBrains Mono',monospace}
 
-/* Hero */
-.hero {
-  text-align: center;
-  padding: 48px 24px 32px;
-  background: linear-gradient(135deg, var(--bg-hero), var(--bg));
-  border-bottom: 1px solid var(--line);
-  position: relative;
-}
-.hero-badge {
-  display: inline-block;
-  background: var(--primary);
-  color: #fff;
-  padding: 6px 18px;
-  border-radius: 2px;
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: 3px;
-  margin-bottom: 16px;
-}
-.hero h1 {
-  font-family: "Noto Serif TC", serif;
-  font-size: clamp(28px, 4vw, 40px);
-  font-weight: 900;
-  margin-bottom: 8px;
-}
-.hero .sub {
-  color: var(--text-2);
-  font-size: 14px;
-  max-width: 640px;
-  margin: 0 auto;
-}
+/* ═══ 登入鎖屏 ═══ */
+#auth-overlay{display:none;position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#FDFBF8 0%,#FDF3F4 100%);overflow-y:auto}
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+.auth-card{max-width:420px;width:100%;background:#fff;border:1px solid var(--border);border-radius:12px;padding:32px 24px;box-shadow:0 16px 48px rgba(42,26,28,.08)}
+.auth-logo{width:72px;height:72px;margin:0 auto 16px;border-radius:16px;background:linear-gradient(135deg,#B51E28,var(--r2));color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif TC',serif;font-size:28px;font-weight:900;box-shadow:0 12px 32px rgba(165,24,32,.25)}
+.auth-field{margin-bottom:14px}
+.auth-field label{display:block;font-size:11px;color:var(--muted);font-weight:700;letter-spacing:1px;margin-bottom:6px}
+.auth-field input{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:6px;font-size:14px;font-family:inherit;box-sizing:border-box;background:var(--bg)}
+.auth-btn{background:linear-gradient(135deg,#B51E28,var(--r2));color:#fff;border:none;padding:14px;border-radius:6px;font-size:14px;font-weight:700;letter-spacing:2px;font-family:'Noto Serif TC',serif;cursor:pointer;width:100%;margin-top:4px}
+.auth-link{background:transparent;color:var(--muted);border:none;padding:8px;font-size:11px;cursor:pointer;text-decoration:underline;font-family:inherit;width:100%;margin-top:4px}
+.auth-error{display:none;background:var(--ai-hl);border:1px solid var(--r1);color:var(--r1);padding:10px 12px;border-radius:6px;font-size:12px;line-height:1.6;margin:8px 0}
 
-/* Info blocks: 電腦資料夾說明 + Firebase + Icon 規則 */
-.info-block {
-  max-width: 900px;
-  margin: 32px auto 0;
-  padding: 0 24px;
-}
-.info-details {
-  background: var(--bg-card);
-  border-radius: 6px;
-  margin-bottom: 10px;
-  border: 1px solid var(--line);
-  overflow: hidden;
-  transition: all 0.2s;
-}
-.info-details[open] {
-  border-color: var(--primary);
-  box-shadow: 0 4px 16px rgba(165, 24, 32, 0.08);
-}
-.info-details summary {
-  padding: 14px 20px;
-  font-family: "Noto Serif TC", serif;
-  font-weight: 700;
-  font-size: 15px;
-  color: var(--text);
-  cursor: pointer;
-  user-select: none;
-  list-style: none;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: background 0.2s;
-}
-.info-details summary::-webkit-details-marker { display: none; }
-.info-details summary::after {
-  content: "▼";
-  margin-left: auto;
-  color: var(--text-3);
-  font-size: 11px;
-  transition: transform 0.2s;
-}
-.info-details[open] summary::after { transform: rotate(180deg); }
-.info-details summary:hover { background: var(--bg-accent); }
-.info-body {
-  padding: 0 20px 20px;
-  font-size: 13px;
-  line-height: 1.8;
-  color: var(--text);
-}
-.info-body p { margin-bottom: 10px; }
-.info-body ul { padding-left: 20px; margin-bottom: 10px; }
-.info-body li { padding: 2px 0; }
-.info-body code {
-  font-family: "JetBrains Mono", monospace;
-  background: var(--bg);
-  padding: 1px 6px;
-  border-radius: 2px;
-  font-size: 11px;
-  color: var(--primary);
-}
-.folder-tree {
-  background: var(--text);
-  color: #FDFBF8;
-  padding: 16px 20px;
-  border-radius: 4px;
-  margin: 12px 0;
-  overflow-x: auto;
-}
-.folder-tree pre {
-  font-family: "JetBrains Mono", "Courier New", monospace;
-  font-size: 11px;
-  line-height: 1.6;
-  white-space: pre;
-  color: #FDFBF8;
-  margin: 0;
-}
-.tip-callout {
-  background: var(--bg-accent);
-  border-left: 3px solid var(--primary);
-  padding: 10px 14px;
-  border-radius: 0 4px 4px 0;
-  margin-top: 12px;
-  font-size: 12px;
-  color: var(--primary-deep);
-  line-height: 1.7;
-}
-.tip-callout strong { color: var(--primary); }
-.compare-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 12px 0;
-  font-size: 12px;
-  background: var(--bg);
-  border-radius: 4px;
-  overflow: hidden;
-  border: 1px solid var(--line);
-}
-.compare-table th, .compare-table td {
-  padding: 8px 12px;
-  text-align: left;
-  border-bottom: 1px solid var(--line);
-}
-.compare-table th {
-  background: var(--primary);
-  color: #fff;
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: 1px;
-}
-.compare-table tr:last-child td { border-bottom: none; }
-.icon-example-row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin: 14px 0;
-}
-.icon-item {
-  text-align: center;
-  font-size: 10px;
-  color: var(--text-2);
-}
-.mini-icon {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, #B51E28, #7A1018);
-  color: #fff;
-  border-radius: 11px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: "Noto Serif TC", serif;
-  font-weight: 900;
-  font-size: 20px;
-  margin-bottom: 4px;
-  box-shadow: 0 4px 10px rgba(165, 24, 32, 0.2);
-}
-.progress-overall {
-  max-width: 800px;
-  margin: 24px auto 0;
-  padding: 0 24px;
-}
-.progress-stats {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  font-size: 13px;
-}
-.progress-label {
-  color: var(--text-2);
-  font-weight: 700;
-}
-.progress-percent {
-  font-family: "Noto Serif TC", serif;
-  color: var(--primary);
-  font-size: 24px;
-  font-weight: 900;
-}
-.progress-bar {
-  height: 8px;
-  background: var(--bg-card);
-  border-radius: 4px;
-  overflow: hidden;
-  position: relative;
-}
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary), var(--primary-bright));
-  border-radius: 4px;
-  transition: width 0.3s;
-}
+/* ═══ 頂部導覽 ═══ */
+.topbar{background:linear-gradient(90deg,var(--r2),var(--r1));color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(165,24,32,.2)}
+.topbar-title{font-family:'Noto Serif TC',serif;font-weight:900;font-size:15px;letter-spacing:.08em}
+.topbar-actions{display:flex;align-items:center;gap:10px}
+.sync-status{font-size:10px;color:rgba(255,255,255,.85)}
+.logout-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:10px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:inherit}
+.logout-btn:hover{background:rgba(255,255,255,.25)}
 
-/* Toolbar */
-.toolbar {
-  background: var(--bg-card);
-  padding: 12px 24px;
-  border-bottom: 1px solid var(--line);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  backdrop-filter: blur(10px);
-}
-.toolbar-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-.filter-btn {
-  background: transparent;
-  border: 1px solid var(--line);
-  color: var(--text-2);
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  cursor: pointer;
-  font-family: inherit;
-  transition: all 0.2s;
-}
-.filter-btn.active {
-  background: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
-}
-.filter-btn:hover:not(.active) { background: var(--bg); }
-.spacer { flex: 1; }
-.action-btn {
-  background: var(--text);
-  color: #fff;
-  border: none;
-  padding: 6px 14px;
-  border-radius: 4px;
-  font-size: 12px;
-  cursor: pointer;
-  font-family: inherit;
-  transition: opacity 0.2s;
-}
-.action-btn:hover { opacity: 0.85; }
-.action-btn.primary { background: var(--primary); }
+/* ═══ Hero ═══ */
+.hero{background:var(--hero);padding:32px 20px 24px;border-bottom:1px solid var(--border)}
+.hero-badge{display:inline-block;font-size:10px;font-weight:900;color:var(--r1);letter-spacing:.25em;margin-bottom:8px}
+.hero h1{font-family:'Noto Serif TC',serif;font-size:32px;font-weight:900;margin-bottom:6px}
+.hero-sub{color:var(--muted);font-size:13px;font-style:italic}
 
-/* Main */
-.wrap { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+/* ═══ 頂端統計 ═══ */
+.stats-bar{background:#fff;border-bottom:1px solid var(--border);padding:16px 20px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:720px;margin:0 auto}
+.stat-card{background:var(--card);border-radius:8px;padding:12px;text-align:center;border:1px solid var(--border)}
+.stat-num{font-family:'Noto Serif TC',serif;font-weight:900;font-size:22px;color:var(--r1);line-height:1}
+.stat-label{font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:.1em}
 
-.phase {
-  margin-bottom: 32px;
-}
-.phase-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  background: var(--bg-card);
-  border-left: 4px solid var(--primary);
-  border-radius: 4px;
-  margin-bottom: 12px;
-  cursor: pointer;
-  user-select: none;
-}
-.phase-header:hover { background: #EDE8E0; }
-.phase-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.phase-num {
-  font-family: "Noto Serif TC", serif;
-  font-weight: 900;
-  font-size: 20px;
-  color: var(--primary);
-  min-width: 32px;
-}
-.phase-title {
-  font-family: "Noto Serif TC", serif;
-  font-weight: 700;
-  font-size: 18px;
-}
-.phase-sub {
-  color: var(--text-2);
-  font-size: 12px;
-  margin-left: 8px;
-}
-.phase-count {
-  background: var(--primary);
-  color: #fff;
-  font-size: 11px;
-  padding: 3px 10px;
-  border-radius: 10px;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-.phase-count.done { background: var(--done); }
-.phase-toggle {
-  color: var(--text-3);
-  font-size: 14px;
-  transition: transform 0.2s;
-  margin-left: 8px;
-}
-.phase.collapsed .phase-toggle { transform: rotate(-90deg); }
-.phase.collapsed .tasks { display: none; }
+/* ═══ 工具列 ═══ */
+.toolbar{background:#fff;padding:14px 20px;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:8px;align-items:center;position:sticky;top:50px;z-index:90}
+.tool-btn{background:var(--r1);color:#fff;border:none;padding:9px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.tool-btn.secondary{background:transparent;color:var(--r1);border:1px solid var(--r1)}
+.filter-chip{background:var(--card);color:var(--muted);border:1px solid var(--border);padding:6px 12px;border-radius:16px;font-size:11px;cursor:pointer;font-family:inherit}
+.filter-chip.active{background:var(--r1);color:#fff;border-color:var(--r1)}
 
-.tasks { padding-left: 8px; }
+/* ═══ 新增任務 Modal ═══ */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(42,26,28,.6);z-index:9000;padding:20px;overflow-y:auto}
+.modal-overlay.show{display:block}
+.modal{background:#fff;max-width:520px;margin:40px auto;border-radius:12px;padding:24px;box-shadow:0 24px 64px rgba(0,0,0,.2)}
+.modal h2{font-family:'Noto Serif TC',serif;font-size:20px;font-weight:900;margin-bottom:16px}
+.modal-field{margin-bottom:14px}
+.modal-field label{display:block;font-size:11px;color:var(--muted);font-weight:700;letter-spacing:1px;margin-bottom:6px}
+.modal-field input,.modal-field textarea,.modal-field select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit;box-sizing:border-box;background:var(--bg)}
+.modal-field textarea{resize:vertical;min-height:80px}
+.modal-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
 
-.task {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 10px 16px;
-  border-radius: 4px;
-  margin-bottom: 4px;
-  transition: background 0.15s;
-  border-left: 3px solid transparent;
-}
-.task:hover { background: var(--bg-card); }
-.task.done {
-  opacity: 0.55;
-  border-left-color: var(--done);
-  background: rgba(74, 124, 89, 0.04);
-}
-.task.done .task-title {
-  text-decoration: line-through;
-  color: var(--text-2);
-}
+/* ═══ 任務卡 ═══ */
+.tasks-wrap{padding:20px;max-width:720px;margin:0 auto}
+.task-group{margin-bottom:28px}
+.task-group-header{font-family:'Noto Serif TC',serif;font-size:14px;font-weight:900;color:var(--r1);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.task-card{background:#fff;border:1px solid var(--border);border-left:3px solid var(--r1);padding:14px;margin-bottom:10px;border-radius:6px;transition:all .2s}
+.task-card.done{opacity:.55;border-left-color:var(--light);background:var(--card)}
+.task-card.milestone{border-left:4px solid var(--gold);background:linear-gradient(135deg,#FDFBF8,#FDF3F4)}
+.task-head{display:flex;gap:10px;align-items:flex-start;margin-bottom:6px}
+.task-check{flex-shrink:0;width:20px;height:20px;border:2px solid var(--r1);border-radius:4px;cursor:pointer;margin-top:2px;display:flex;align-items:center;justify-content:center;background:#fff}
+.task-check.checked{background:var(--r1);color:#fff}
+.task-content{flex:1;min-width:0}
+.task-title{font-weight:700;font-size:13px;color:var(--text);word-break:break-word}
+.task-card.done .task-title{text-decoration:line-through}
+.task-desc{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.6}
+.task-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:10px;color:var(--light)}
+.task-tag{padding:2px 8px;border-radius:10px;border:1px solid var(--border);background:var(--card);font-weight:700}
+.tag-p0{background:#FAE8EA;color:var(--r1);border-color:var(--r1)}
+.tag-p1{background:#FFF3DC;color:#9A6A10;border-color:#D4A574}
+.tag-p2{background:#E8F1FA;color:#2A5080;border-color:#7AA0C8}
+.tag-site{background:var(--card);color:var(--muted)}
+.tag-milestone{background:linear-gradient(135deg,#D4A574,#9A6A10);color:#fff;border:none}
+.task-actions{display:flex;gap:6px;margin-top:6px}
+.task-mini-btn{background:transparent;border:none;color:var(--light);font-size:10px;cursor:pointer;padding:2px 4px;font-family:inherit}
+.task-mini-btn:hover{color:var(--r1);text-decoration:underline}
 
-.task-check {
-  flex-shrink: 0;
-  width: 22px;
-  height: 22px;
-  border: 2px solid var(--line);
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  margin-top: 2px;
-  background: var(--bg);
-}
-.task-check:hover { border-color: var(--primary); }
-.task.done .task-check {
-  background: var(--done);
-  border-color: var(--done);
-}
-.task.done .task-check::after {
-  content: "✓";
-  color: #fff;
-  font-weight: 900;
-  font-size: 14px;
-}
+/* ═══ 里程碑時間軸 ═══ */
+.milestone-wall{background:linear-gradient(135deg,#A51820,#6b0f15);color:#fff;padding:32px 20px;margin-top:40px}
+.milestone-wall-header{max-width:720px;margin:0 auto 20px}
+.milestone-wall-header .badge{font-size:10px;font-weight:900;color:#F0C0C5;letter-spacing:.25em;margin-bottom:6px}
+.milestone-wall-header h2{font-family:'Noto Serif TC',serif;font-size:26px;font-weight:900}
+.milestone-wall-header .sub{font-size:12px;color:#F0C0C5;font-style:italic;margin-top:4px}
+.timeline{max-width:720px;margin:0 auto;position:relative;padding-left:30px}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:rgba(255,255,255,.2)}
+.timeline-item{position:relative;margin-bottom:18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);padding:12px 14px;border-radius:6px;backdrop-filter:blur(4px)}
+.timeline-item::before{content:'';position:absolute;left:-27px;top:16px;width:16px;height:16px;border-radius:50%;background:var(--gold);border:3px solid #6b0f15}
+.timeline-date{font-size:10px;color:#F0C0C5;font-weight:700;letter-spacing:.1em;margin-bottom:4px}
+.timeline-title{font-weight:700;font-size:13px;color:#fff}
+.timeline-desc{font-size:11px;color:rgba(255,255,255,.75);margin-top:4px}
 
-.task-body { flex: 1; }
-.task-title {
-  font-size: 14px;
-  color: var(--text);
-  font-weight: 500;
-  line-height: 1.6;
-}
-.task-desc {
-  font-size: 12px;
-  color: var(--text-2);
-  margin-top: 3px;
-  line-height: 1.5;
-}
-.task-tag {
-  display: inline-block;
-  background: var(--bg-accent);
-  color: var(--primary-deep);
-  padding: 1px 8px;
-  border-radius: 10px;
-  font-size: 10px;
-  margin-right: 4px;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-.task-tag.p0 { background: #FEE; color: #C02030; }
-.task-tag.p1 { background: #FFF4E0; color: #D4A574; }
-.task-tag.p2 { background: #E8F0FE; color: #1A73E8; }
-.task-tag.p3 { background: #E8F5E9; color: #4A7C59; }
-.task-tag.habit { background: #F4E8FE; color: #8B5CF6; }
+/* ═══ Footer ═══ */
+.footer{background:var(--r2);color:#fff;padding:24px 20px;text-align:center;margin-top:40px}
+.footer .brand{font-family:'Noto Serif TC',serif;font-size:11px;letter-spacing:.25em;font-weight:700}
+.footer .tagline{font-size:10px;color:rgba(255,255,255,.7);font-style:italic;margin-top:6px}
 
-/* Progress sharing box */
-.share-box {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--text);
-  color: #fff;
-  padding: 12px 24px;
-  z-index: 100;
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
-  display: none;
-}
-.share-box.show { display: block; }
-.share-inner {
-  max-width: 900px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.share-box .label {
-  font-size: 12px;
-  opacity: 0.7;
-  margin-bottom: 4px;
-}
-.share-box .text {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 12px;
-  background: rgba(255,255,255,0.08);
-  padding: 8px 12px;
-  border-radius: 3px;
-  max-width: 560px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.share-box button {
-  background: var(--primary-bright);
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 700;
-  font-family: inherit;
-}
+/* ═══ 浮動新增按鈕 ═══ */
+.fab{position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#B51E28,var(--r2));color:#fff;border:none;font-size:28px;cursor:pointer;box-shadow:0 12px 24px rgba(165,24,32,.35);z-index:80;display:flex;align-items:center;justify-content:center}
 
-/* Highlight next task */
-.task.next-todo {
-  border-left-color: var(--primary);
-  background: var(--bg-hero);
-  position: relative;
-}
-.task.next-todo::before {
-  content: "👉 下一步";
-  position: absolute;
-  top: 8px;
-  right: 12px;
-  background: var(--primary);
-  color: #fff;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 10px;
-  letter-spacing: 1px;
-  font-weight: 700;
-}
-
-/* Empty state */
-.empty {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--text-3);
-  font-size: 14px;
-}
-
-/* Last updated */
-.footer {
-  text-align: center;
-  padding: 32px 20px;
-  color: var(--text-3);
-  font-size: 11px;
-  letter-spacing: 1px;
-}
-.footer .brand {
-  font-family: "Noto Serif TC", serif;
-  color: var(--primary);
-  font-weight: 700;
-  letter-spacing: 3px;
-  margin-bottom: 6px;
+/* RWD */
+@media(max-width:600px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .hero h1{font-size:24px}
+  .modal-row{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 
+<!-- ═══ 登入鎖屏 ═══ -->
+<div id="auth-overlay">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div style="text-align:center;margin-bottom:28px">
+        <div class="auth-logo">T</div>
+        <div class="serif" style="font-size:22px;font-weight:900;margin-bottom:4px">ICS Tasks</div>
+        <div style="font-size:11px;color:var(--r1);letter-spacing:.25em;font-weight:700;margin-bottom:8px">PRIVATE · FOUNDERS ONLY</div>
+        <div style="font-size:12px;color:var(--muted);font-style:italic">請登入以繼續</div>
+      </div>
+      <div class="auth-field">
+        <label>電子郵件</label>
+        <input type="email" id="auth-email" autocomplete="email" placeholder="your@email.com">
+      </div>
+      <div class="auth-field">
+        <label>密碼</label>
+        <input type="password" id="auth-password" autocomplete="current-password" placeholder="••••••••••••">
+      </div>
+      <div id="auth-error" class="auth-error"></div>
+      <button id="auth-login-btn" class="auth-btn">登 入</button>
+      <button id="auth-reset-btn" class="auth-link">忘記密碼？</button>
+      <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border);text-align:center">
+        <div class="serif" style="font-size:11px;color:var(--r1);letter-spacing:.25em;font-weight:700">INSPIRE · CREATE · SHINE</div>
+        <div style="font-size:10px;color:var(--light);font-style:italic;margin-top:4px">Finding beauty. Making it move.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 頂部導覽 ═══ -->
+<div class="topbar">
+  <div class="topbar-title">ICS Tasks · 執行清單 V2</div>
+  <div class="topbar-actions">
+    <span id="sync-status" class="sync-status">⏳ 連線中...</span>
+    <button id="logout-btn" class="logout-btn" style="display:none">登出</button>
+  </div>
+</div>
+
+<!-- ═══ Hero ═══ -->
 <div class="hero">
-  <div class="hero-badge">ICS PROJECT · TASK BOARD</div>
+  <div class="hero-badge">ICS PROJECT · TASK BOARD V2</div>
   <h1 class="serif">專案執行清單</h1>
-  <div class="sub">勾選你已完成的任務 · 系統自動保存 · 隨時回來都能繼續</div>
+  <div class="hero-sub">每天的進度 · 每個里程碑 · 雲端永久保存</div>
 </div>
 
-<!-- Quick Help Section: 放哪 / Firebase / Icon -->
-<div class="info-block">
-  <details class="info-details">
-    <summary>📁 電腦資料夾要放哪裡？（點我展開）</summary>
-    <div class="info-body">
-      <p><strong>推薦位置：iCloud Drive 或 Google Drive 裡</strong>（自動雲端同步，電腦壞了不怕）</p>
-      <div class="folder-tree">
-<pre>📁 iCloud Drive（或 Google Drive）
-  └── 📁 ICS 品牌專案/ ⬅ 主資料夾放這裡
-        │
-        ├── 📁 00_網站上線檔/ ★核心★
-        │   ├── 📁 Site_1_Handbook_學習手冊/
-        │   ├── 📁 Site_2_Scripts_腳本產生器/
-        │   ├── 📁 Site_3_Matrix_選題矩陣/
-        │   ├── 📁 Site_4_Brand_品牌規範書/
-        │   ├── 📁 Site_5_Home_總入口頁/
-        │   ├── 📁 Site_6_Tasks_執行清單/ ⭐ 新
-        │   └── 📁 Shared_共用素材/
-        │       ├── Icons_圖示/
-        │       │   ├── ICS_主Logo/
-        │       │   ├── H_Handbook/
-        │       │   ├── M_Matrix/
-        │       │   ├── S_Scripts/
-        │       │   ├── B_Brand/
-        │       │   └── T_Tasks/ ⭐ 新
-        │       ├── Colors_色票/
-        │       └── Logos_標誌/
-        │
-        ├── 📁 00B_Astra個人軌資產/ ← Astra 分開管理
-        │
-        ├── 📁 01_重大里程碑備份/
-        │   └── 2026-04-23_V1_42格版本/
-        │
-        ├── 📁 02_原始素材/ ← Claude 給的 ZIP 原檔
-        │   └── 從Claude下載_20260423/
-        │
-        ├── 📁 03_決策日誌/
-        │   └── DECISIONS.md
-        │
-        └── 📁 04_創業SOP手冊/
-            └── STARTUP_SOP.md</pre>
-      </div>
-      <div class="tip-callout">
-        💡 <strong>觀念</strong>：電腦資料夾放「正在用的檔案」；GitHub 自動保存所有歷史版本；iCloud/Google Drive 自動跨裝置同步。三層備份，你什麼都不用手動做。
-      </div>
+<!-- ═══ 頂端統計 ═══ -->
+<div class="stats-bar">
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div id="stat-today" class="stat-num">0</div>
+      <div class="stat-label">今日完成</div>
     </div>
-  </details>
-
-  <details class="info-details">
-    <summary>🔥 Firebase 需要嗎？（點我展開）</summary>
-    <div class="info-body">
-      <p><strong>答案：現在不需要。</strong></p>
-      <table class="compare-table">
-        <tr><th>功能</th><th>GitHub Pages（你在用）</th><th>Firebase</th></tr>
-        <tr><td>網站託管</td><td>✓ 免費</td><td>✓ 免費</td></tr>
-        <tr><td>跨裝置使用</td><td>✓ 網址統一</td><td>✓ 網址統一</td></tr>
-        <tr><td>資料庫</td><td>✗ 沒有</td><td>✓ 有</td></tr>
-        <tr><td>登入系統</td><td>✗ 沒有</td><td>✓ 有</td></tr>
-        <tr><td>學習難度</td><td>簡單</td><td>中等</td></tr>
-      </table>
-      <p><strong>什麼時候會用到 Firebase？</strong></p>
-      <ul>
-        <li>要做「客戶登入自己的 Portal」</li>
-        <li>要「多人協作編輯」</li>
-        <li>要「跨裝置同步清單進度」</li>
-      </ul>
-      <p>這些都是未來 3-6 個月後才需要的功能。現在用 GitHub Pages 完全夠。</p>
-      <div class="tip-callout">
-        💡 <strong>你的清單進度</strong>現在存在瀏覽器的 localStorage 裡，同一個瀏覽器就能保存。未來要跨裝置同步進度時，再用 Firebase。
-      </div>
+    <div class="stat-card">
+      <div id="stat-week" class="stat-num">0</div>
+      <div class="stat-label">本週完成</div>
     </div>
-  </details>
-
-  <details class="info-details">
-    <summary>🎨 未來新增工具的 Icon 規則（點我展開）</summary>
-    <div class="info-body">
-      <p><strong>每次新增一個工具，都要有一個專屬 Icon。規則：</strong></p>
-      <ul>
-        <li>底色：深玫瑰紅漸層 <code>#B51E28 → #7A1018</code></li>
-        <li>字母：工具英文名首字母（Noto Serif TC 白色）</li>
-        <li>裝飾：金線 <code>#D4A574</code> + 工具英文名 uppercase</li>
-        <li>尺寸：32 / 180 / 192 / 512 PNG + SVG</li>
-        <li>圓角：22%（112/512）</li>
-      </ul>
-      <p><strong>現有系列：</strong></p>
-      <div class="icon-example-row">
-        <div class="icon-item"><div class="mini-icon">ICS</div><div>主 Logo</div></div>
-        <div class="icon-item"><div class="mini-icon">H</div><div>Handbook</div></div>
-        <div class="icon-item"><div class="mini-icon">M</div><div>Matrix</div></div>
-        <div class="icon-item"><div class="mini-icon">S</div><div>Scripts</div></div>
-        <div class="icon-item"><div class="mini-icon">B</div><div>Brand</div></div>
-        <div class="icon-item"><div class="mini-icon">T</div><div>Tasks ⭐</div></div>
-      </div>
-      <div class="tip-callout">
-        💡 <strong>未來新增</strong>：Portal = P、Report = R、Academy = A... 依此類推。跟 Claude 說「幫我做 X 工具的 icon」即可。
-      </div>
+    <div class="stat-card">
+      <div id="stat-month" class="stat-num">0</div>
+      <div class="stat-label">本月完成</div>
     </div>
-  </details>
-</div>
-
-<!-- Progress -->
-<div class="progress-overall">
-  <div class="progress-stats">
-    <span class="progress-label">整體進度</span>
-    <span class="progress-percent" id="percent">0%</span>
-  </div>
-  <div class="progress-bar">
-    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-  </div>
-  <div class="progress-stats" style="margin-top: 6px;">
-    <span style="color: var(--text-3); font-size: 11px;" id="statText">0 / 0 已完成</span>
-    <span style="color: var(--text-3); font-size: 11px;" id="lastUpdate"></span>
+    <div class="stat-card">
+      <div id="stat-total" class="stat-num">0</div>
+      <div class="stat-label">總任務數</div>
+    </div>
   </div>
 </div>
 
-<!-- Toolbar -->
+<!-- ═══ 工具列 ═══ -->
 <div class="toolbar">
-  <div class="toolbar-inner">
-    <button class="filter-btn active" data-filter="all">全部</button>
-    <button class="filter-btn" data-filter="todo">未完成</button>
-    <button class="filter-btn" data-filter="done">已完成</button>
-    <button class="filter-btn" data-filter="p0">🔥 P0 今天</button>
-    <button class="filter-btn" data-filter="p1">⭐ P1 本週</button>
-    <button class="filter-btn" data-filter="p2">📅 P2 本月</button>
-    <button class="filter-btn" data-filter="habit">🔄 習慣</button>
-    <div class="spacer"></div>
-    <button class="action-btn" onclick="toggleShareBox()">📋 複製進度給 AI</button>
-    <button class="action-btn" onclick="exportProgress()">💾 匯出</button>
+  <button class="tool-btn" onclick="openAddModal()">➕ 新增任務</button>
+  <span class="filter-chip active" data-filter="all">全部</span>
+  <span class="filter-chip" data-filter="active">未完成</span>
+  <span class="filter-chip" data-filter="done">已完成</span>
+  <span class="filter-chip" data-filter="milestone">⭐ 里程碑</span>
+  <span class="filter-chip" data-filter="p0">🔴 P0</span>
+  <span class="filter-chip" data-filter="p1">🟡 P1</span>
+  <span class="filter-chip" data-filter="p2">🔵 P2</span>
+</div>
+
+<!-- ═══ 任務列表 ═══ -->
+<div class="tasks-wrap" id="tasks-wrap">
+  <div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">載入中...</div>
+</div>
+
+<!-- ═══ 里程碑時間軸 ═══ -->
+<div class="milestone-wall">
+  <div class="milestone-wall-header">
+    <div class="badge">⭐ MILESTONES · 時間軸</div>
+    <h2 class="serif">里程碑牆</h2>
+    <div class="sub">每一個標記里程碑的任務 · 都會來到這裡</div>
+  </div>
+  <div class="timeline" id="milestone-timeline">
+    <div style="color:rgba(255,255,255,.6);font-size:12px;font-style:italic;text-align:center">還沒有里程碑 · 標記任務為里程碑就會出現在這</div>
   </div>
 </div>
 
-<div class="wrap" id="wrap"></div>
-
-<!-- Share box -->
-<div class="share-box" id="shareBox">
-  <div class="share-inner">
-    <div style="flex:1;">
-      <div class="label">📋 把這段複製給 AI 就知道你的進度</div>
-      <div class="text" id="shareText"></div>
-    </div>
-    <button onclick="copyShareText()">複製</button>
-    <button onclick="toggleShareBox()" style="background: transparent; border: 1px solid rgba(255,255,255,0.3);">關閉</button>
-  </div>
-</div>
-
+<!-- ═══ Footer ═══ -->
 <div class="footer">
   <div class="brand">INSPIRE · CREATE · SHINE</div>
-  <div>ICS 專案執行清單 V1.2 · 2026/04/23</div>
+  <div class="tagline">Finding beauty. Making it move.</div>
+  <div style="margin-top:10px;font-size:10px;color:rgba(255,255,255,.5)">ICS Tasks V2 · 2026/04/24 · Firebase 雲端版</div>
+</div>
+
+<!-- ═══ 浮動新增按鈕 ═══ -->
+<button class="fab" onclick="openAddModal()">+</button>
+
+<!-- ═══ 新增/編輯 Modal ═══ -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <h2 id="modal-title">✨ 新增任務</h2>
+    <div class="modal-field">
+      <label>標題 *</label>
+      <input type="text" id="in-title" placeholder="例：完成 Handbook Ch11 章節">
+    </div>
+    <div class="modal-field">
+      <label>說明</label>
+      <textarea id="in-desc" placeholder="詳細描述（選填）"></textarea>
+    </div>
+    <div class="modal-row">
+      <div class="modal-field">
+        <label>優先級</label>
+        <select id="in-priority">
+          <option value="p1">🟡 P1 · 中</option>
+          <option value="p0">🔴 P0 · 緊急</option>
+          <option value="p2">🔵 P2 · 低</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label>所屬網站</label>
+        <select id="in-site">
+          <option value="">— 選填 —</option>
+          <option value="handbook">📖 Handbook</option>
+          <option value="matrix">🎯 Matrix</option>
+          <option value="scripts">✏️ Scripts</option>
+          <option value="brand">📚 Brand</option>
+          <option value="tasks">⭐ Tasks</option>
+          <option value="home">🏠 Home</option>
+          <option value="astra">✨ Astra</option>
+          <option value="other">其他</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-field">
+        <label>期限</label>
+        <input type="date" id="in-deadline">
+      </div>
+      <div class="modal-field">
+        <label>&nbsp;</label>
+        <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:6px;cursor:pointer;background:var(--bg)">
+          <input type="checkbox" id="in-milestone" style="width:auto">
+          <span style="font-size:13px">⭐ 標記為里程碑</span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-field">
+      <label>備註</label>
+      <textarea id="in-note" placeholder="額外備註（選填）"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="tool-btn secondary" onclick="closeAddModal()">取消</button>
+      <button class="tool-btn" onclick="saveTask()">💾 儲存</button>
+    </div>
+  </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════
-// 任務資料
-// ═══════════════════════════════════════════════
-const TASKS = [
-  // ─── 🏆 昨日戰績：2026/04/23 第一天 17 項里程碑 ─────────
-  {
-    phase: "昨日戰績 · 2026/04/23", phaseIcon: "🏆", phaseDesc: "第一天 17 項里程碑（全部自動打勾 · 紀念用）",
-    items: [
-      { id: "y23-1",  title: "✅ 建立 ICS 三層品牌架構（ICS × H/M/S/B/T）", tags: ["done"], auto_done: true },
-      { id: "y23-2",  title: "✅ 確立視覺系統（主色 #A51820 + Noto Serif TC + 微咖黑）", tags: ["done"], auto_done: true },
-      { id: "y23-3",  title: "✅ Icon 系列 6 款完成（ICS / H / M / S / B / T）", tags: ["done"], auto_done: true },
-      { id: "y23-4",  title: "✅ Matrix 升級為 PWA（可安裝為 App）", tags: ["done"], auto_done: true },
-      { id: "y23-5",  title: "✅ Matrix 從 28 格 → 42 格（新增容器③選立場 14 格）", tags: ["done"], auto_done: true },
-      { id: "y23-6",  title: "✅ 品牌規範書 V1 → V2 → V3（含錨點導覽 + 回頂 + Scroll Spy）", tags: ["done"], auto_done: true },
-      { id: "y23-7",  title: "✅ 總入口頁 luckylisaaa.github.io 上線（根網址）", tags: ["done"], auto_done: true },
-      { id: "y23-8",  title: "✅ Tasks 執行清單上線（PWA）", tags: ["done"], auto_done: true },
-      { id: "y23-9",  title: "✅ 六大資料夾架構建立", tags: ["done"], auto_done: true },
-      { id: "y23-10", title: "✅ Astra 個人軌獨立管理（00B 資料夾）", tags: ["done"], auto_done: true },
-      { id: "y23-11", title: "✅ 重大里程碑備份機制建立", tags: ["done"], auto_done: true },
-      { id: "y23-12", title: "✅ ZIP 原始素材全部歸檔到 02_原始素材/", tags: ["done"], auto_done: true },
-      { id: "y23-13", title: "✅ 學會 GitHub 版本控制觀念", tags: ["done"], auto_done: true },
-      { id: "y23-14", title: "✅ Commit Message 標準格式養成", tags: ["done"], auto_done: true },
-      { id: "y23-15", title: "✅ 手機桌面 ICS 三連裝（ICS / M / T icon）", tags: ["done"], auto_done: true },
-      { id: "y23-16", title: "✅ 決策日誌 V1 模板（10 條重大決策）", tags: ["done"], auto_done: true },
-      { id: "y23-17", title: "✅ 創業 SOP 手冊 V1 模板", tags: ["done"], auto_done: true },
-      { id: "y23-bonus", title: "✨ 超額達成：浮動導覽貼到 handbook + script-generator（六網站打通）", tags: ["done"], auto_done: true },
-    ]
-  },
-  // ─── 📋 今日收尾：2026/04/24 三件 P0 ─────────
-  {
-    phase: "今日收尾 · 2026/04/24", phaseIcon: "📋", phaseDesc: "接續昨天節奏的三件 P0 任務",
-    items: [
-      { id: "t24-1", title: "Tasks V1.2 上傳（覆蓋 tasks repo）", desc: "就是你現在看的這個版本！Commit message：[FEAT] Tasks清單V1.2更新今日戰績｜Tasks V1.2 with today achievements", tags: ["p0"] },
-      { id: "t24-2", title: "Matrix 56 格上傳（覆蓋 matrix repo）", desc: "新增容器 ④ 教知識 14 張作戰卡。先備份現在的 42 格版到 01_重大里程碑備份/，再覆蓋。Commit：[FEAT] 新增容器④教知識14格｜Add container 4 (14 cards)", tags: ["p0"] },
-      { id: "t24-3", title: "Handbook Build Log 更新（對內紀錄）", desc: "手動編輯 handbook/index.html，貼上 2026/04/23 的 17 項里程碑紀錄。Commit：[DOCS] 新增2026/04/23 Build Log｜Add Build Log entry", tags: ["p0"] },
-      { id: "t24-close", title: "🎯 今日三件收尾達成", desc: "完成後記得點右上角「複製進度給 AI」存一份，明天接著打 112 格矩陣", tags: ["p0"] },
-    ]
-  },
-  // ─── 階段 1：今天核心任務（P0）─────────
-  {
-    phase: "今天必做", phaseIcon: "🔥", phaseDesc: "Priority 0 · 完成就能用",
-    items: [
-      { id: "p0-1", title: "解壓 3_MATRIX_42cards ZIP 到 Site_3_Matrix 資料夾", desc: "覆蓋舊的 28 格版本（GitHub 會自動備份舊版，不用擔心）", tags: ["p0"] },
-      { id: "p0-2", title: "上傳 Matrix 42 格到 GitHub（覆蓋舊版）", desc: "Commit message：[FEAT] 新增容器③選立場14格｜Add container 3 (14 cards)", tags: ["p0"] },
-      { id: "p0-3", title: "解壓 2_BRAND_V3 ZIP 到 Site_4_Brand 資料夾", desc: "V3 新增錨點導覽 + 回頂按鈕", tags: ["p0"] },
-      { id: "p0-4", title: "上傳品牌規範書 V3 到 GitHub（覆蓋 V2）", desc: "Commit message：[FEAT] 品牌規範書V3加入錨點導覽｜Brand guidelines V3 with anchor nav", tags: ["p0"] },
-      { id: "p0-5", title: "解壓 1_總入口頁 ZIP 到 Site_5_Home 資料夾", desc: "含 index.html + manifest + 5 個 icon", tags: ["p0"] },
-      { id: "p0-6", title: "建立新 GitHub repo 名稱為 luckylisaaa.github.io", desc: "特殊名稱 = 會變成你的根網址首頁", tags: ["p0"] },
-      { id: "p0-7", title: "上傳總入口頁所有 7 個檔案到新 repo", desc: "Commit message：[FEAT] 建立ICS品牌總入口頁｜Create ICS brand portal", tags: ["p0"] },
-      { id: "p0-8", title: "啟動 GitHub Pages（Settings → Pages → main / root → Save）", desc: "等 1-2 分鐘拿到網址 luckylisaaa.github.io/", tags: ["p0"] },
-      { id: "p0-9", title: "手機 Safari 打開 luckylisaaa.github.io 並加到主畫面", desc: "ICS 品牌 icon 出現在手機桌面", tags: ["p0"] },
-    ]
-  },
-  // ─── 階段 2：資料夾整理 ─────────
-  {
-    phase: "電腦資料夾整理", phaseIcon: "📁", phaseDesc: "建立六大架構",
-    items: [
-      { id: "fs-1", title: "建立主資料夾「ICS 品牌專案」", tags: ["p0"] },
-      { id: "fs-2", title: "建立 00_網站上線檔/（5 個 Site 子資料夾 + Shared）", tags: ["p0"] },
-      { id: "fs-3", title: "建立 00B_Astra個人軌資產/（把 Astra 檔案搬進來）", tags: ["p1"] },
-      { id: "fs-4", title: "建立 01_重大里程碑備份/", desc: "只在大版本改變時才備份（GitHub 自動有歷史）", tags: ["p1"] },
-      { id: "fs-5", title: "建立 02_原始素材/ 存放 Claude 給的 ZIP 原檔", tags: ["p1"] },
-      { id: "fs-6", title: "建立 03_決策日誌/ 放 DECISIONS.md（我給的 ZIP 5）", tags: ["p0"] },
-      { id: "fs-7", title: "建立 04_創業SOP手冊/ 放 STARTUP_SOP.md（我給的 ZIP 6）", tags: ["p0"] },
-      { id: "fs-8", title: "把 Site_1_Handbook 裡的 70 個舊版本 HTML 刪除或搬到 Archive", desc: "GitHub 都有歷史，電腦不用留", tags: ["p1"] },
-    ]
-  },
-  // ─── 階段 3：三網站互相導覽 ─────────
-  {
-    phase: "三網站互相導覽", phaseIcon: "🔗", phaseDesc: "讓每個工具都能跳到另外的",
-    items: [
-      { id: "nav-1", title: "打開 ICS導覽浮動按鈕_貼到每個網站.html 複製全部內容", tags: ["p1"] },
-      { id: "nav-2", title: "編輯 GitHub handbook 的 index.html，在 </body> 前貼上", desc: "Commit message：[FEAT] 加入ICS浮動導覽｜Add ICS floating nav", tags: ["p1"] },
-      { id: "nav-3", title: "編輯 GitHub script-generator 的 index.html，在 </body> 前貼上", desc: "Commit message：[FEAT] 加入ICS浮動導覽｜Add ICS floating nav", tags: ["p1"] },
-      { id: "nav-4", title: "驗證五個網站右下角都有紅色圓形浮動按鈕", desc: "handbook / matrix / scripts / brand / home", tags: ["p1"] },
-    ]
-  },
-  // ─── 階段 4：矩陣內容擴充 ─────────
-  {
-    phase: "矩陣內容擴充", phaseIcon: "📖", phaseDesc: "從 42 格到 112 格完整版",
-    items: [
-      { id: "mx-3", title: "✅ 已完成：容器 ③ 選立場 14 格", tags: ["p0"], auto_done: true },
-      { id: "mx-4", title: "容器 ④ 教知識 14 格", desc: "跟 Claude 要第 4 批（告訴它：繼續矩陣第 4 批｜容器④教知識）", tags: ["p1"] },
-      { id: "mx-5", title: "容器 ⑤ 熬情緒 14 格", tags: ["p1"] },
-      { id: "mx-6", title: "容器 ⑥ 演劇情 14 格", tags: ["p1"] },
-      { id: "mx-7", title: "容器 ⑦ 賣產品 14 格", tags: ["p1"] },
-      { id: "mx-8", title: "容器 ⑧ 破圈挑戰 ★ 14 格", tags: ["p1"] },
-      { id: "mx-done", title: "🎉 112 格完整版達成", desc: "品牌里程碑！記得到 01_重大里程碑備份/ 存一份", tags: ["p1"] },
-    ]
-  },
-  // ─── 階段 5：PWA 全網站升級 ─────────
-  {
-    phase: "PWA 全網站升級", phaseIcon: "📱", phaseDesc: "所有網站都變成可安裝 App",
-    items: [
-      { id: "pwa-1", title: "✅ 已完成：Matrix 升級為 PWA", tags: [], auto_done: true },
-      { id: "pwa-2", title: "Handbook 升級為 PWA", desc: "跟 Claude 要 PWA 升級包", tags: ["p1"] },
-      { id: "pwa-3", title: "Scripts 升級為 PWA", tags: ["p1"] },
-      { id: "pwa-4", title: "Brand Guidelines 升級為 PWA", tags: ["p1"] },
-      { id: "pwa-5", title: "Home 升級為 PWA", desc: "manifest.json 已準備好，只缺 sw.js", tags: ["p1"] },
-    ]
-  },
-  // ─── 階段 6：重大決策紀錄 ─────────
-  {
-    phase: "決策日誌系統", phaseIcon: "📝", phaseDesc: "記錄重要決定背後的思考",
-    items: [
-      { id: "dec-1", title: "打開 DECISIONS.md 讀過一次（我已幫你寫了 10 個決策）", tags: ["p0"] },
-      { id: "dec-2", title: "未來每個重大決策都寫一條（遵循模板格式）", tags: ["habit"] },
-      { id: "dec-3", title: "每月整理一次決策日誌（看過去 30 天做了什麼）", tags: ["habit"] },
-    ]
-  },
-  // ─── 階段 7：創業 SOP 累積 ─────────
-  {
-    phase: "創業 SOP 手冊", phaseIcon: "📕", phaseDesc: "把經驗變成可複製的流程",
-    items: [
-      { id: "sop-1", title: "打開 STARTUP_SOP.md 讀過一次（我已幫你寫了 V1.0）", tags: ["p0"] },
-      { id: "sop-2", title: "完成每個階段後，回來更新 SOP（加入踩過的坑、優化點）", tags: ["habit"] },
-      { id: "sop-3", title: "112 格矩陣完成後，大幅更新 SOP V2.0", tags: ["p1"] },
-      { id: "sop-4", title: "未來開新事業（例如股票事業），複製這份 SOP 執行", tags: ["p3"] },
-    ]
-  },
-  // ─── 階段 8：習慣養成 ─────────
-  {
-    phase: "日常習慣養成", phaseIcon: "🔄", phaseDesc: "每次操作都遵守這些原則",
-    items: [
-      { id: "h-1", title: "每次 commit 都用標準格式：[類別] 中文｜English description", desc: "FEAT 新增｜FIX 修正｜STYLE 樣式｜DOCS 文件｜REFACTOR 重構", tags: ["habit"] },
-      { id: "h-2", title: "遇到重大決策就記 DECISIONS.md", desc: "記錄：做了什麼 / 為什麼 / 替代方案", tags: ["habit"] },
-      { id: "h-3", title: "每週五回來這份清單檢查進度並更新", tags: ["habit"] },
-      { id: "h-4", title: "每次中斷工作前，點「複製進度給 AI」存一份", desc: "下次回來貼給 AI 它就知道你做到哪", tags: ["habit"] },
-    ]
-  },
-  // ─── 階段 9：中期規劃 ─────────
-  {
-    phase: "中期規劃（1-3 個月）", phaseIcon: "📅", phaseDesc: "當下不急，記著就好",
-    items: [
-      { id: "m-1", title: "建立對外提案簡報（PDF / Keynote）", tags: ["p2"] },
-      { id: "m-2", title: "建立客戶案例展示頁", tags: ["p2"] },
-      { id: "m-3", title: "報價單精美版（客戶版 PDF）", tags: ["p2"] },
-      { id: "m-4", title: "合約範本對齊律師審閱", tags: ["p2"] },
-      { id: "m-5", title: "買品牌網域（inspirecreateshine.com 或類似）", tags: ["p2"] },
-      { id: "m-6", title: "搬家：GitHub → 自有網域 + 子網域規劃", tags: ["p2"] },
-      { id: "m-7", title: "Google Analytics 安裝到所有網站", tags: ["p2"] },
-      { id: "m-8", title: "名片設計（實體 + 電子簽名檔）", tags: ["p2"] },
-    ]
-  },
-  // ─── 階段 10：長期願景 ─────────
-  {
-    phase: "長期願景（3-12 個月）", phaseIcon: "🚀", phaseDesc: "不要現在做，但方向先在",
-    items: [
-      { id: "l-1", title: "接下 1-3 個正式客戶（驗證商業模式）", tags: ["p3"] },
-      { id: "l-2", title: "建立客戶 Portal（每客戶自己的儀表板）", tags: ["p3"] },
-      { id: "l-3", title: "把方法論變成線上課程 / 訂閱制", tags: ["p3"] },
-      { id: "l-4", title: "付費 Google Drive 200GB（有客戶資料時）", tags: ["p3"] },
-      { id: "l-5", title: "外接硬碟大備份（半年週期）", tags: ["p3"] },
-      { id: "l-6", title: "用 ICS 的 SOP 開新事業（股票 / 其他產品線）", tags: ["p3"] },
-    ]
-  },
-];
+// ═══════════════════════════════════════════════════════
+// Firebase 初始化（集中派 · 連 lucky-handbook）
+// ═══════════════════════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyDSw-N0KsSXUdKHEatiJa3tut0m279C_38",
+  authDomain: "lucky-handbook.firebaseapp.com",
+  projectId: "lucky-handbook",
+  storageBucket: "lucky-handbook.firebasestorage.app",
+  messagingSenderId: "618597633790",
+  appId: "1:618597633790:web:e25c4c7b48406b99d6dfaf"
+};
 
-// ═══════════════════════════════════════════════
-// 初始化
-// ═══════════════════════════════════════════════
-const STORAGE_KEY = "ics-tasks-v1";
-let state = { done: {}, updated: null };
+const FOUNDER_UID = "7PVhEyBe9XbEcdAqbq2uLtEqRLC2";
 
-function loadState() {
-  try {
-    const s = localStorage.getItem(STORAGE_KEY);
-    if (s) state = JSON.parse(s);
-  } catch(e) {}
-  // Apply auto_done
-  TASKS.forEach(ph => ph.items.forEach(t => {
-    if (t.auto_done && !(t.id in state.done)) state.done[t.id] = true;
-  }));
+if(!firebase.apps.length){ firebase.initializeApp(firebaseConfig); }
+const db = firebase.firestore();
+const auth = firebase.auth();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+let currentUser = null;
+let editingTaskId = null;
+let allTasks = [];
+let currentFilter = 'all';
+
+// ═══════════════════════════════════════════════════════
+// Auth 控制
+// ═══════════════════════════════════════════════════════
+function setSyncStatus(txt, isError){
+  const el = document.getElementById('sync-status');
+  if(el){ el.textContent = txt; el.style.color = isError ? '#FAE8EA' : 'rgba(255,255,255,.85)'; }
 }
 
-function saveState() {
-  state.updated = new Date().toISOString();
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
-}
-
-function toggleTask(id) {
-  state.done[id] = !state.done[id];
-  saveState();
-  render();
-}
-
-let currentFilter = "all";
-function setFilter(f) {
-  currentFilter = f;
-  document.querySelectorAll(".filter-btn").forEach(b => {
-    b.classList.toggle("active", b.dataset.filter === f);
-  });
-  render();
-}
-
-function passesFilter(task, phaseName) {
-  if (currentFilter === "all") return true;
-  if (currentFilter === "todo") return !state.done[task.id];
-  if (currentFilter === "done") return state.done[task.id];
-  return task.tags && task.tags.includes(currentFilter);
-}
-
-function togglePhase(idx) {
-  const el = document.querySelector(`[data-phase-idx="${idx}"]`);
-  if (el) el.classList.toggle("collapsed");
-}
-
-function findNextTodo() {
-  for (const ph of TASKS) {
-    for (const t of ph.items) {
-      if (!state.done[t.id] && t.tags && t.tags.includes("p0")) return t.id;
-    }
+auth.onAuthStateChanged(function(user){
+  currentUser = user;
+  const overlay = document.getElementById('auth-overlay');
+  const logoutBtn = document.getElementById('logout-btn');
+  if(user){
+    overlay.style.display = 'none';
+    document.body.style.overflow = '';
+    if(user.uid === FOUNDER_UID){ document.body.setAttribute('data-role','founder'); }
+    if(logoutBtn){ logoutBtn.style.display = 'inline-block'; logoutBtn.title = user.email; }
+    setSyncStatus('☁️ 已連線');
+    loadTasks();
+  } else {
+    overlay.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    if(logoutBtn) logoutBtn.style.display = 'none';
+    setSyncStatus('⚠️ 未登入', true);
   }
-  for (const ph of TASKS) {
-    for (const t of ph.items) {
-      if (!state.done[t.id]) return t.id;
-    }
-  }
-  return null;
-}
-
-function render() {
-  const wrap = document.getElementById("wrap");
-  wrap.innerHTML = "";
-  const nextTodo = findNextTodo();
-  let total = 0, done = 0;
-
-  TASKS.forEach((ph, phaseIdx) => {
-    const visibleItems = ph.items.filter(t => passesFilter(t, ph.phase));
-    if (visibleItems.length === 0 && currentFilter !== "all") return;
-    const phaseTotal = ph.items.length;
-    const phaseDone = ph.items.filter(t => state.done[t.id]).length;
-    total += phaseTotal;
-    done += phaseDone;
-
-    const phaseEl = document.createElement("div");
-    phaseEl.className = "phase";
-    phaseEl.dataset.phaseIdx = phaseIdx;
-
-    const allDone = phaseDone === phaseTotal && phaseTotal > 0;
-    phaseEl.innerHTML = `
-      <div class="phase-header" onclick="togglePhase(${phaseIdx})">
-        <div class="phase-info">
-          <div class="phase-num">${ph.phaseIcon}</div>
-          <div>
-            <div class="phase-title">${ph.phase}</div>
-            <div class="phase-sub">${ph.phaseDesc || ""}</div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div class="phase-count ${allDone ? 'done' : ''}">${phaseDone} / ${phaseTotal}</div>
-          <span class="phase-toggle">▼</span>
-        </div>
-      </div>
-      <div class="tasks"></div>
-    `;
-
-    const tasksEl = phaseEl.querySelector(".tasks");
-    visibleItems.forEach(t => {
-      const isDone = state.done[t.id];
-      const isNext = t.id === nextTodo;
-      const taskEl = document.createElement("div");
-      taskEl.className = "task" + (isDone ? " done" : "") + (isNext && !isDone ? " next-todo" : "");
-      taskEl.onclick = (e) => {
-        if (e.target.tagName === "A") return;
-        toggleTask(t.id);
-      };
-      const tags = (t.tags || []).map(tag => {
-        const labels = { p0: "🔥 今天", p1: "⭐ 本週", p2: "📅 中期", p3: "🚀 長期", habit: "🔄 習慣" };
-        return labels[tag] ? `<span class="task-tag ${tag}">${labels[tag]}</span>` : "";
-      }).join("");
-      taskEl.innerHTML = `
-        <div class="task-check"></div>
-        <div class="task-body">
-          <div>${tags}<span class="task-title">${t.title}</span></div>
-          ${t.desc ? `<div class="task-desc">${t.desc}</div>` : ""}
-        </div>
-      `;
-      tasksEl.appendChild(taskEl);
-    });
-
-    wrap.appendChild(phaseEl);
-  });
-
-  // Progress
-  const pct = total ? Math.round(done / total * 100) : 0;
-  document.getElementById("percent").textContent = pct + "%";
-  document.getElementById("progressFill").style.width = pct + "%";
-  document.getElementById("statText").textContent = `${done} / ${total} 已完成`;
-  const upd = state.updated ? new Date(state.updated) : null;
-  document.getElementById("lastUpdate").textContent = upd ? "最後更新：" + upd.toLocaleString("zh-TW") : "";
-
-  if (total > 0 && done === 0 && currentFilter !== "all") {
-    wrap.innerHTML = `<div class="empty">這個分類沒有任務或都已完成 🎉</div>`;
-  }
-}
-
-// Filter binding
-document.querySelectorAll(".filter-btn").forEach(b => {
-  b.addEventListener("click", () => setFilter(b.dataset.filter));
 });
 
-// ═══════════════════════════════════════════════
-// Share progress to AI
-// ═══════════════════════════════════════════════
-function buildShareText() {
-  const lines = [];
-  lines.push("【我的 ICS 專案進度彙報】");
-  lines.push("");
-  let total = 0, done = 0;
-  TASKS.forEach(ph => {
-    const phTotal = ph.items.length;
-    const phDone = ph.items.filter(t => state.done[t.id]).length;
-    total += phTotal; done += phDone;
-    lines.push(`${ph.phaseIcon} ${ph.phase}：${phDone}/${phTotal}`);
-    const notDone = ph.items.filter(t => !state.done[t.id]);
-    if (notDone.length > 0) {
-      notDone.slice(0, 3).forEach(t => {
-        lines.push(`  □ ${t.title}`);
+document.addEventListener('DOMContentLoaded', function(){
+  // 登入
+  const emailInput = document.getElementById('auth-email');
+  const passwordInput = document.getElementById('auth-password');
+  const loginBtn = document.getElementById('auth-login-btn');
+  const resetBtn = document.getElementById('auth-reset-btn');
+  const errorBox = document.getElementById('auth-error');
+
+  function showError(msg){ errorBox.textContent = msg; errorBox.style.display = 'block'; }
+  function hideError(){ errorBox.style.display = 'none'; }
+
+  function doLogin(){
+    hideError();
+    const email = emailInput.value.trim();
+    const pwd = passwordInput.value;
+    if(!email || !pwd){ showError('請輸入電子郵件和密碼'); return; }
+    loginBtn.textContent = '登入中...';
+    loginBtn.disabled = true;
+    auth.signInWithEmailAndPassword(email, pwd)
+      .catch(function(err){
+        loginBtn.textContent = '登 入';
+        loginBtn.disabled = false;
+        const msg = {
+          'auth/invalid-email':'電子郵件格式錯誤',
+          'auth/user-not-found':'找不到這個帳號',
+          'auth/wrong-password':'密碼錯誤',
+          'auth/invalid-credential':'電子郵件或密碼錯誤',
+          'auth/too-many-requests':'嘗試太多次，請稍後再試',
+          'auth/network-request-failed':'網路連線失敗'
+        }[err.code] || ('登入失敗：' + err.message);
+        showError(msg);
       });
-      if (notDone.length > 3) lines.push(`  ... 還有 ${notDone.length - 3} 項未完成`);
-    }
+  }
+  loginBtn.addEventListener('click', doLogin);
+  passwordInput.addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+  emailInput.addEventListener('keydown', function(e){ if(e.key==='Enter') passwordInput.focus(); });
+
+  resetBtn.addEventListener('click', function(){
+    const email = emailInput.value.trim();
+    if(!email){ showError('請先填電子郵件'); return; }
+    auth.sendPasswordResetEmail(email)
+      .then(function(){ alert('重設密碼信已寄到 ' + email); })
+      .catch(function(err){ showError('寄送失敗：' + err.message); });
   });
-  lines.push("");
-  lines.push(`整體進度：${done}/${total} (${Math.round(done/total*100)}%)`);
-  lines.push(`更新時間：${new Date().toLocaleString("zh-TW")}`);
-  lines.push("");
-  lines.push("---");
-  lines.push("基於以上進度，請建議我下一步做什麼。");
-  return lines.join("\n");
+
+  // 登出
+  document.getElementById('logout-btn').addEventListener('click', function(){
+    if(!confirm('確定要登出嗎？')) return;
+    auth.signOut().then(function(){ location.reload(); });
+  });
+
+  // 篩選 chips
+  document.querySelectorAll('.filter-chip').forEach(function(c){
+    c.addEventListener('click', function(){
+      document.querySelectorAll('.filter-chip').forEach(function(x){ x.classList.remove('active'); });
+      c.classList.add('active');
+      currentFilter = c.dataset.filter;
+      renderTasks();
+    });
+  });
+});
+
+// ═══════════════════════════════════════════════════════
+// Tasks CRUD
+// ═══════════════════════════════════════════════════════
+function loadTasks(){
+  if(!currentUser) return;
+  setSyncStatus('☁️ 載入中...');
+  db.collection('tasks').orderBy('createdAt','desc').get()
+    .then(function(snap){
+      allTasks = [];
+      snap.forEach(function(doc){ allTasks.push({id:doc.id, ...doc.data()}); });
+      // 若沒資料，插入種子（昨日戰績 17 項 + 今日里程碑）
+      if(allTasks.length === 0){
+        seedInitialTasks();
+        return;
+      }
+      renderTasks();
+      setSyncStatus('☁️ 已同步 ' + allTasks.length + ' 項');
+    })
+    .catch(function(err){
+      console.error(err);
+      setSyncStatus('⚠️ 讀取失敗', true);
+    });
 }
 
-function toggleShareBox() {
-  const box = document.getElementById("shareBox");
-  if (box.classList.contains("show")) {
-    box.classList.remove("show");
+function seedInitialTasks(){
+  const seeds = [
+    // 2026/04/23 第一天里程碑
+    {title:'建立 ICS 三層品牌架構',desc:'ICS × H/M/S/B/T 六套 icon',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:''},
+    {title:'確立視覺系統（#A51820 + Noto Serif TC）',desc:'主色、字體、色票系統',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:'brand'},
+    {title:'6 套 Icon 完成',desc:'ICS / H / M / S / B / T 各 5 尺寸',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:''},
+    {title:'Matrix 升級 PWA · 42 格',desc:'可安裝為 App + 新增容器③選立場',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:'matrix'},
+    {title:'六網站全部上線',desc:'總入口/Handbook/Matrix/Scripts/Brand/Tasks',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:''},
+    {title:'六大資料夾架構建立',desc:'00~04 資料夾分類完成',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:''},
+    // 2026/04/24 第二天里程碑
+    {title:'Handbook V3 → V5 大升級',desc:'浮動導覽/素材包/Ch6-Ch10',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:'handbook'},
+    {title:'Firebase Auth 登入系統上架',desc:'Handbook 完整 SaaS 雛形',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:'handbook'},
+    {title:'雲端日記 + 密碼管理器',desc:'Build Log 分頁新增兩大功能',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:'handbook'},
+    {title:'Firebase 安全規則發布',desc:'lucky-handbook + script-generator 都鎖定',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:''},
+    {title:'Scripts V2 → V3 集中派遷移',desc:'改連 lucky-handbook · v9 compat 統一',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:'scripts'},
+    {title:'Tasks V2 完整重寫',desc:'Firebase 雲端同步 + 里程碑時間軸',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:'tasks'},
+  ];
+  setSyncStatus('☁️ 首次初始化...');
+  const batch = [];
+  seeds.forEach(function(seed){
+    batch.push(db.collection('tasks').add({
+      ...seed,
+      level: 'owner',
+      author: currentUser.uid,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }));
+  });
+  Promise.all(batch).then(function(){
+    loadTasks(); // 重新載入
+  });
+}
+
+function renderTasks(){
+  const wrap = document.getElementById('tasks-wrap');
+  const filtered = allTasks.filter(function(t){
+    if(currentFilter === 'all') return true;
+    if(currentFilter === 'active') return !t.done;
+    if(currentFilter === 'done') return t.done;
+    if(currentFilter === 'milestone') return t.milestone;
+    return t.priority === currentFilter;
+  });
+
+  updateStats();
+  renderMilestones();
+
+  if(filtered.length === 0){
+    wrap.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px;font-style:italic">沒有符合條件的任務 · 點右下角 ➕ 新增一個</div>';
+    return;
+  }
+
+  // 依 done 狀態分組
+  const active = filtered.filter(function(t){ return !t.done; });
+  const done = filtered.filter(function(t){ return t.done; });
+
+  let html = '';
+  if(active.length > 0){
+    html += '<div class="task-group"><div class="task-group-header">⏳ 進行中 · ' + active.length + ' 項</div>';
+    active.forEach(function(t){ html += renderTaskCard(t); });
+    html += '</div>';
+  }
+  if(done.length > 0){
+    html += '<div class="task-group"><div class="task-group-header">✅ 已完成 · ' + done.length + ' 項</div>';
+    done.forEach(function(t){ html += renderTaskCard(t); });
+    html += '</div>';
+  }
+  wrap.innerHTML = html;
+
+  // 綁定事件
+  wrap.querySelectorAll('[data-action="toggle"]').forEach(function(el){
+    el.addEventListener('click', function(){ toggleDone(el.dataset.id); });
+  });
+  wrap.querySelectorAll('[data-action="edit"]').forEach(function(el){
+    el.addEventListener('click', function(){ openEditModal(el.dataset.id); });
+  });
+  wrap.querySelectorAll('[data-action="delete"]').forEach(function(el){
+    el.addEventListener('click', function(){ deleteTask(el.dataset.id); });
+  });
+}
+
+function escapeHtml(s){ return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function renderTaskCard(t){
+  const siteMap = {handbook:'📖 Handbook',matrix:'🎯 Matrix',scripts:'✏️ Scripts',brand:'📚 Brand',tasks:'⭐ Tasks',home:'🏠 Home',astra:'✨ Astra',other:'其他'};
+  const priorityMap = {p0:'<span class="task-tag tag-p0">🔴 P0</span>',p1:'<span class="task-tag tag-p1">🟡 P1</span>',p2:'<span class="task-tag tag-p2">🔵 P2</span>'};
+  return '<div class="task-card ' + (t.done?'done':'') + ' ' + (t.milestone?'milestone':'') + '">' +
+    '<div class="task-head">' +
+      '<div class="task-check ' + (t.done?'checked':'') + '" data-action="toggle" data-id="' + t.id + '">' + (t.done?'✓':'') + '</div>' +
+      '<div class="task-content">' +
+        '<div class="task-title">' + (t.milestone?'⭐ ':'') + escapeHtml(t.title) + '</div>' +
+        (t.desc ? '<div class="task-desc">' + escapeHtml(t.desc) + '</div>' : '') +
+        '<div class="task-meta">' +
+          (t.priority ? priorityMap[t.priority] || '' : '') +
+          (t.site && siteMap[t.site] ? '<span class="task-tag tag-site">' + siteMap[t.site] + '</span>' : '') +
+          (t.milestone ? '<span class="task-tag tag-milestone">⭐ 里程碑</span>' : '') +
+          (t.deadline ? '<span class="task-tag">📅 ' + escapeHtml(t.deadline) + '</span>' : '') +
+          (t.doneAt ? '<span class="task-tag">✓ ' + escapeHtml(t.doneAt) + '</span>' : '') +
+        '</div>' +
+        (t.note ? '<div class="task-desc" style="margin-top:6px;padding-top:6px;border-top:1px dashed var(--border)">📝 ' + escapeHtml(t.note) + '</div>' : '') +
+        '<div class="task-actions">' +
+          '<button class="task-mini-btn" data-action="edit" data-id="' + t.id + '">編輯</button>' +
+          '<button class="task-mini-btn" data-action="delete" data-id="' + t.id + '">刪除</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function updateStats(){
+  const today = new Date();
+  const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  
+  const weekAgo = new Date(today.getTime() - 7*24*60*60*1000);
+  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+
+  let todayCnt = 0, weekCnt = 0, monthCnt = 0;
+  allTasks.forEach(function(t){
+    if(!t.done || !t.doneAt) return;
+    const d = new Date(t.doneAt);
+    if(t.doneAt === todayStr) todayCnt++;
+    if(d >= weekAgo) weekCnt++;
+    if(d >= monthStart) monthCnt++;
+  });
+
+  document.getElementById('stat-today').textContent = todayCnt;
+  document.getElementById('stat-week').textContent = weekCnt;
+  document.getElementById('stat-month').textContent = monthCnt;
+  document.getElementById('stat-total').textContent = allTasks.length;
+}
+
+function renderMilestones(){
+  const timeline = document.getElementById('milestone-timeline');
+  const milestones = allTasks
+    .filter(function(t){ return t.milestone && t.done; })
+    .sort(function(a,b){ return (b.doneAt || '').localeCompare(a.doneAt || ''); });
+
+  if(milestones.length === 0){
+    timeline.innerHTML = '<div style="color:rgba(255,255,255,.6);font-size:12px;font-style:italic;text-align:center">還沒有里程碑 · 標記任務為里程碑就會出現在這</div>';
+    return;
+  }
+
+  timeline.innerHTML = milestones.map(function(t){
+    return '<div class="timeline-item">' +
+      '<div class="timeline-date">' + (t.doneAt || '未標記日期') + '</div>' +
+      '<div class="timeline-title">' + escapeHtml(t.title) + '</div>' +
+      (t.desc ? '<div class="timeline-desc">' + escapeHtml(t.desc) + '</div>' : '') +
+    '</div>';
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// 新增 / 編輯
+// ═══════════════════════════════════════════════════════
+function openAddModal(){
+  editingTaskId = null;
+  document.getElementById('modal-title').textContent = '✨ 新增任務';
+  document.getElementById('in-title').value = '';
+  document.getElementById('in-desc').value = '';
+  document.getElementById('in-priority').value = 'p1';
+  document.getElementById('in-site').value = '';
+  document.getElementById('in-deadline').value = '';
+  document.getElementById('in-milestone').checked = false;
+  document.getElementById('in-note').value = '';
+  document.getElementById('add-modal').classList.add('show');
+  setTimeout(function(){ document.getElementById('in-title').focus(); }, 100);
+}
+
+function openEditModal(id){
+  const t = allTasks.find(function(x){ return x.id === id; });
+  if(!t) return;
+  editingTaskId = id;
+  document.getElementById('modal-title').textContent = '✏️ 編輯任務';
+  document.getElementById('in-title').value = t.title || '';
+  document.getElementById('in-desc').value = t.desc || '';
+  document.getElementById('in-priority').value = t.priority || 'p1';
+  document.getElementById('in-site').value = t.site || '';
+  document.getElementById('in-deadline').value = t.deadline || '';
+  document.getElementById('in-milestone').checked = !!t.milestone;
+  document.getElementById('in-note').value = t.note || '';
+  document.getElementById('add-modal').classList.add('show');
+}
+
+function closeAddModal(){
+  document.getElementById('add-modal').classList.remove('show');
+}
+
+function saveTask(){
+  const title = document.getElementById('in-title').value.trim();
+  if(!title){ alert('請填寫標題'); return; }
+  const data = {
+    title: title,
+    desc: document.getElementById('in-desc').value.trim(),
+    priority: document.getElementById('in-priority').value,
+    site: document.getElementById('in-site').value,
+    deadline: document.getElementById('in-deadline').value,
+    milestone: document.getElementById('in-milestone').checked,
+    note: document.getElementById('in-note').value.trim(),
+    level: 'owner',
+    author: currentUser.uid,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  if(editingTaskId){
+    db.collection('tasks').doc(editingTaskId).update(data)
+      .then(function(){ closeAddModal(); loadTasks(); })
+      .catch(function(err){ alert('更新失敗：' + err.message); });
   } else {
-    document.getElementById("shareText").textContent = buildShareText();
-    box.classList.add("show");
+    data.done = false;
+    data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+    db.collection('tasks').add(data)
+      .then(function(){ closeAddModal(); loadTasks(); })
+      .catch(function(err){ alert('新增失敗：' + err.message); });
   }
 }
 
-function copyShareText() {
-  const text = buildShareText();
-  navigator.clipboard.writeText(text).then(() => {
-    alert("✓ 已複製！去貼給 AI 就能知道你的進度");
-  }).catch(() => {
-    // Fallback
-    const ta = document.createElement("textarea");
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand("copy");
-    document.body.removeChild(ta);
-    alert("✓ 已複製！");
-  });
+function toggleDone(id){
+  const t = allTasks.find(function(x){ return x.id === id; });
+  if(!t) return;
+  const newDone = !t.done;
+  const today = new Date();
+  const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  db.collection('tasks').doc(id).update({
+    done: newDone,
+    doneAt: newDone ? todayStr : null,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(loadTasks);
 }
 
-function exportProgress() {
-  const text = buildShareText();
-  const blob = new Blob([text], { type: "text/plain" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `ICS進度_${new Date().toISOString().slice(0,10)}.txt`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+function deleteTask(id){
+  if(!confirm('確定要刪除這個任務嗎？')) return;
+  db.collection('tasks').doc(id).delete().then(loadTasks);
 }
 
-// Expose globals
-window.togglePhase = togglePhase;
-window.toggleShareBox = toggleShareBox;
-window.copyShareText = copyShareText;
-window.exportProgress = exportProgress;
-
-// Init
-loadState();
-render();
+// 點 modal 外關閉
+document.getElementById('add-modal').addEventListener('click', function(e){
+  if(e.target.id === 'add-modal') closeAddModal();
+});
 </script>
+
+<!-- ═══ ICS 浮動導覽 ═══ -->
+<style>
+#icsNavWidget{position:fixed;bottom:96px;right:24px;z-index:70}
+#icsNavWidget .ics-nav-trigger{width:48px;height:48px;border-radius:50%;background:var(--r2);color:#fff;border:none;font-size:22px;cursor:pointer;box-shadow:0 8px 20px rgba(122,16,24,.3);display:flex;align-items:center;justify-content:center}
+#icsNavWidget .ics-nav-menu{display:none;position:absolute;bottom:60px;right:0;width:260px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:0 16px 40px rgba(0,0,0,.12)}
+#icsNavWidget .ics-nav-menu.open{display:block}
+#icsNavWidget .ics-nav-title{font-family:'Noto Serif TC',serif;font-weight:900;color:var(--r1);font-size:13px;margin-bottom:2px}
+#icsNavWidget .ics-nav-tagline{font-size:10px;color:var(--muted);letter-spacing:.2em;margin-bottom:10px}
+#icsNavWidget .ics-nav-item{display:flex;align-items:center;gap:10px;padding:8px;border-radius:6px;text-decoration:none;color:var(--text);border:1px solid var(--border);margin-bottom:6px;transition:all .15s}
+#icsNavWidget .ics-nav-item:hover{background:var(--card);border-color:var(--r1)}
+#icsNavWidget .ics-nav-item.current{background:var(--ai-hl);border-color:var(--r1)}
+#icsNavWidget .ics-nav-icon{width:28px;height:28px;background:linear-gradient(135deg,#B51E28,var(--r2));color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif TC',serif;font-weight:900;font-size:12px;flex-shrink:0}
+#icsNavWidget .ics-nav-text{flex:1;min-width:0}
+#icsNavWidget .ics-nav-name{font-size:12px;font-weight:700}
+#icsNavWidget .ics-nav-desc{font-size:10px;color:var(--muted)}
+</style>
+<div id="icsNavWidget">
+  <div class="ics-nav-menu" id="icsNavMenu">
+    <div class="ics-nav-title">ICS 工具系統</div>
+    <div class="ics-nav-tagline">INSPIRE · CREATE · SHINE</div>
+    <a href="https://luckylisaaa.github.io/" class="ics-nav-item" data-site="root"><div class="ics-nav-icon">ICS</div><div class="ics-nav-text"><div class="ics-nav-name">首頁</div><div class="ics-nav-desc">Home · 總入口</div></div></a>
+    <a href="https://luckylisaaa.github.io/handbook/" class="ics-nav-item" data-site="handbook"><div class="ics-nav-icon">H</div><div class="ics-nav-text"><div class="ics-nav-name">Handbook</div><div class="ics-nav-desc">完整學習手冊</div></div></a>
+    <a href="https://luckylisaaa.github.io/matrix/" class="ics-nav-item" data-site="matrix"><div class="ics-nav-icon">M</div><div class="ics-nav-text"><div class="ics-nav-name">Matrix</div><div class="ics-nav-desc">選題作戰矩陣</div></div></a>
+    <a href="https://luckylisaaa.github.io/script-generator/" class="ics-nav-item" data-site="scripts"><div class="ics-nav-icon">S</div><div class="ics-nav-text"><div class="ics-nav-name">Scripts</div><div class="ics-nav-desc">腳本產生器</div></div></a>
+    <a href="https://luckylisaaa.github.io/brand-guidelines/" class="ics-nav-item" data-site="brand"><div class="ics-nav-icon">B</div><div class="ics-nav-text"><div class="ics-nav-name">Brand</div><div class="ics-nav-desc">品牌視覺規範</div></div></a>
+    <a href="https://luckylisaaa.github.io/tasks/" class="ics-nav-item current" data-site="tasks"><div class="ics-nav-icon">T</div><div class="ics-nav-text"><div class="ics-nav-name">Tasks</div><div class="ics-nav-desc">執行清單 · 目前</div></div></a>
+  </div>
+  <button class="ics-nav-trigger" id="icsNavTrigger">+</button>
+</div>
+<script>
+(function(){
+  var t = document.getElementById('icsNavTrigger');
+  var m = document.getElementById('icsNavMenu');
+  t.addEventListener('click', function(e){ e.stopPropagation(); m.classList.toggle('open'); });
+  document.addEventListener('click', function(e){
+    if(!document.getElementById('icsNavWidget').contains(e.target)){ m.classList.remove('open'); }
+  });
+})();
+</script>
+
 </body>
 </html>
