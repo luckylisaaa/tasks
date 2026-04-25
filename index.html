@@ -713,9 +713,9 @@ document.getElementById('add-modal').addEventListener('click', function(e){
 
 <!-- ═══ ICS 浮動導覽 ═══ -->
 <style>
-#icsNavWidget{position:fixed;bottom:96px;right:24px;z-index:70}
-#icsNavWidget .ics-nav-trigger{width:48px;height:48px;border-radius:50%;background:var(--r2);color:#fff;border:none;font-size:22px;cursor:pointer;box-shadow:0 8px 20px rgba(122,16,24,.3);display:flex;align-items:center;justify-content:center}
-#icsNavWidget .ics-nav-menu{display:none;position:absolute;bottom:60px;right:0;width:260px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:0 16px 40px rgba(0,0,0,.12)}
+#icsNavWidget{position:fixed;bottom:96px;right:24px;z-index:9999}
+#icsNavWidget .ics-nav-trigger{width:48px;height:48px;border-radius:50%;background:var(--r2);color:#fff;border:none;font-size:22px;cursor:pointer;box-shadow:0 8px 20px rgba(122,16,24,.3);display:flex;align-items:center;justify-content:center;position:relative;z-index:10000}
+#icsNavWidget .ics-nav-menu{display:none;position:absolute;bottom:60px;right:0;width:260px;max-height:calc(100vh - 180px);overflow-y:auto;background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:0 16px 40px rgba(0,0,0,.18);z-index:9999}
 #icsNavWidget .ics-nav-menu.open{display:block}
 #icsNavWidget .ics-nav-title{font-family:'Noto Serif TC',serif;font-weight:900;color:var(--r1);font-size:13px;margin-bottom:2px}
 #icsNavWidget .ics-nav-tagline{font-size:10px;color:var(--muted);letter-spacing:.2em;margin-bottom:10px}
