@@ -102,19 +102,21 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .task-mini-btn{background:transparent;border:none;color:var(--light);font-size:10px;cursor:pointer;padding:2px 4px;font-family:inherit}
 .task-mini-btn:hover{color:var(--r1);text-decoration:underline}
 
-/* ═══ 里程碑時間軸 ═══ */
-.milestone-wall{background:linear-gradient(135deg,#A51820,#6b0f15);color:#fff;padding:32px 20px;margin-top:40px}
-.milestone-wall-header{max-width:720px;margin:0 auto 20px}
-.milestone-wall-header .badge{font-size:10px;font-weight:900;color:#F0C0C5;letter-spacing:.25em;margin-bottom:6px}
-.milestone-wall-header h2{font-family:'Noto Serif TC',serif;font-size:26px;font-weight:900}
-.milestone-wall-header .sub{font-size:12px;color:#F0C0C5;font-style:italic;margin-top:4px}
-.timeline{max-width:720px;margin:0 auto;position:relative;padding-left:30px}
-.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:rgba(255,255,255,.2)}
-.timeline-item{position:relative;margin-bottom:18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);padding:12px 14px;border-radius:6px;backdrop-filter:blur(4px)}
-.timeline-item::before{content:'';position:absolute;left:-27px;top:16px;width:16px;height:16px;border-radius:50%;background:var(--gold);border:3px solid #6b0f15}
-.timeline-date{font-size:10px;color:#F0C0C5;font-weight:700;letter-spacing:.1em;margin-bottom:4px}
-.timeline-title{font-weight:700;font-size:13px;color:#fff}
-.timeline-desc{font-size:11px;color:rgba(255,255,255,.75);margin-top:4px}
+/* ═══ 里程碑時間軸 · 米白優雅版 ═══ */
+.milestone-wall{background:var(--bg);padding:36px 20px 28px;margin-top:32px;border-top:1px solid var(--border);position:relative}
+.milestone-wall::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:60px;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.milestone-wall-header{max-width:720px;margin:0 auto 24px;text-align:center}
+.milestone-wall-header .badge{font-size:10px;font-weight:900;color:var(--gold);letter-spacing:.25em;margin-bottom:6px;display:inline-block}
+.milestone-wall-header h2{font-family:'Noto Serif TC',serif;font-size:26px;font-weight:900;color:var(--text)}
+.milestone-wall-header .sub{font-size:12px;color:var(--muted);font-style:italic;margin-top:4px}
+.timeline{max-width:720px;margin:0 auto;position:relative;padding-left:28px}
+.timeline::before{content:'';position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:linear-gradient(180deg,var(--gold) 0%,var(--border) 100%)}
+.timeline-item{position:relative;margin-bottom:14px;background:#fff;border:1px solid var(--border);padding:12px 14px;border-radius:6px;box-shadow:0 1px 3px rgba(42,26,28,.04);transition:all .2s}
+.timeline-item:hover{border-color:var(--gold);box-shadow:0 4px 12px rgba(212,165,116,.15)}
+.timeline-item::before{content:'';position:absolute;left:-25px;top:16px;width:12px;height:12px;border-radius:50%;background:var(--gold);border:2px solid #fff;box-shadow:0 0 0 2px var(--gold)}
+.timeline-date{font-size:10px;color:var(--r1);font-weight:900;letter-spacing:.15em;margin-bottom:4px;font-family:'JetBrains Mono',monospace}
+.timeline-title{font-weight:700;font-size:13px;color:var(--text)}
+.timeline-desc{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.6}
 
 /* ═══ Footer ═══ */
 .footer{background:var(--r2);color:#fff;padding:24px 20px;text-align:center;margin-top:40px}
@@ -122,7 +124,9 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .footer .tagline{font-size:10px;color:rgba(255,255,255,.7);font-style:italic;margin-top:6px}
 
 /* ═══ 浮動新增按鈕 ═══ */
-.fab{position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#B51E28,var(--r2));color:#fff;border:none;font-size:28px;cursor:pointer;box-shadow:0 12px 24px rgba(165,24,32,.35);z-index:80;display:flex;align-items:center;justify-content:center}
+.fab{position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#B51E28,var(--r2));color:#fff;border:none;font-size:22px;cursor:pointer;box-shadow:0 12px 24px rgba(165,24,32,.35);z-index:80;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.fab:hover{transform:scale(1.08)}
+.fab:active{transform:scale(.95)}
 
 /* RWD */
 @media(max-width:600px){
@@ -226,7 +230,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
     <div class="sub">每一個標記里程碑的任務 · 都會來到這裡</div>
   </div>
   <div class="timeline" id="milestone-timeline">
-    <div style="color:rgba(255,255,255,.6);font-size:12px;font-style:italic;text-align:center">還沒有里程碑 · 標記任務為里程碑就會出現在這</div>
+    <div style="color:var(--light);font-size:12px;font-style:italic;text-align:center;padding:20px">還沒有里程碑 · 標記任務為里程碑就會出現在這</div>
   </div>
 </div>
 
@@ -237,8 +241,8 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
   <div style="margin-top:10px;font-size:10px;color:rgba(255,255,255,.5)">ICS Tasks V2 · 2026/04/24 · Firebase 雲端版</div>
 </div>
 
-<!-- ═══ 浮動新增按鈕 ═══ -->
-<button class="fab" onclick="openAddModal()">+</button>
+<!-- ═══ 浮動新增按鈕（鉛筆符號 · 區別浮動導覽的 +） ═══ -->
+<button class="fab" onclick="openAddModal()" title="新增任務">✏️</button>
 
 <!-- ═══ 新增/編輯 Modal ═══ -->
 <div class="modal-overlay" id="add-modal">
@@ -399,7 +403,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // 登出
   document.getElementById('logout-btn').addEventListener('click', function(){
-    if(!confirm('確定要登出嗎？')) return;
+    const msg = '⚠️ 提醒：登出後 Handbook / Scripts / Tasks 會同時登出（共享登入狀態）\n\n確定要登出嗎？';
+    if(!confirm(msg)) return;
     auth.signOut().then(function(){ location.reload(); });
   });
 
@@ -440,22 +445,51 @@ function loadTasks(){
 
 function seedInitialTasks(){
   const seeds = [
-    // 2026/04/23 第一天里程碑
-    {title:'建立 ICS 三層品牌架構',desc:'ICS × H/M/S/B/T 六套 icon',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:''},
-    {title:'確立視覺系統（#A51820 + Noto Serif TC）',desc:'主色、字體、色票系統',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:'brand'},
-    {title:'6 套 Icon 完成',desc:'ICS / H / M / S / B / T 各 5 尺寸',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:''},
-    {title:'Matrix 升級 PWA · 42 格',desc:'可安裝為 App + 新增容器③選立場',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:'matrix'},
-    {title:'六網站全部上線',desc:'總入口/Handbook/Matrix/Scripts/Brand/Tasks',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:''},
-    {title:'六大資料夾架構建立',desc:'00~04 資料夾分類完成',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:''},
-    // 2026/04/24 第二天里程碑
-    {title:'Handbook V3 → V5 大升級',desc:'浮動導覽/素材包/Ch6-Ch10',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:'handbook'},
-    {title:'Firebase Auth 登入系統上架',desc:'Handbook 完整 SaaS 雛形',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:'handbook'},
-    {title:'雲端日記 + 密碼管理器',desc:'Build Log 分頁新增兩大功能',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:'handbook'},
-    {title:'Firebase 安全規則發布',desc:'lucky-handbook + script-generator 都鎖定',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:''},
-    {title:'Scripts V2 → V3 集中派遷移',desc:'改連 lucky-handbook · v9 compat 統一',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:'scripts'},
-    {title:'Tasks V2 完整重寫',desc:'Firebase 雲端同步 + 里程碑時間軸',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:'tasks'},
+    // ═══ 2026/04/23 · 第一天 17 項完整里程碑 ═══
+    {title:'建立 ICS 三層品牌架構',desc:'張家寧（個人）/ Astra（個人軌）/ ICS（商業軌）',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:''},
+    {title:'確立視覺系統',desc:'主色 #A51820 + Noto Serif TC + 微咖黑 · 色票系統 12 色',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:'brand'},
+    {title:'Icon 系列 6 款完成',desc:'ICS / H / M / S / B / T 各 5 尺寸 · 深紅漸層 + 金線',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:''},
+    {title:'Matrix 升級為 PWA',desc:'可安裝為 App · 跨裝置同步',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:'matrix'},
+    {title:'Matrix 從 28 → 42 格',desc:'新增容器③選立場 14 格',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:'matrix'},
+    {title:'品牌規範書 V1→V2→V3',desc:'含錨點導覽 + 回頂 + Scroll Spy',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:'brand'},
+    {title:'總入口頁上線',desc:'luckylisaaa.github.io 根網址',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:'home'},
+    {title:'Tasks 執行清單上線',desc:'第一版 PWA',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:'tasks'},
+    {title:'六大資料夾架構建立',desc:'00_網站上線檔 / 00B / 01~04 完整分類',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:''},
+    {title:'Astra 個人軌獨立管理',desc:'00B 資料夾分離 · 個人品牌不混入商業',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:''},
+    {title:'重大里程碑備份機制建立',desc:'01_重大里程碑備份 資料夾運作',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:''},
+    {title:'ZIP 原始素材全部歸檔',desc:'02_原始素材 / 從Claude下載',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:''},
+    {title:'學會 GitHub 版本控制觀念',desc:'Commits 即歷史 · 不用手動備份舊版',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:''},
+    {title:'Commit Message 標準格式養成',desc:'[類型] 中文｜English',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:''},
+    {title:'手機桌面 ICS 三連裝',desc:'ICS / M / T icon 上桌面',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:''},
+    {title:'決策日誌 V1 模板',desc:'10 條重大決策紀錄',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:''},
+    {title:'創業 SOP 手冊 V1 模板',desc:'四階段完整流程',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:''},
+    {title:'浮動導覽六網站打通',desc:'✨ 超額達成 · handbook + script-generator 互連',priority:'p0',milestone:true,done:true,doneAt:'2026-04-23',site:''},
+
+    // ═══ 2026/04/24 · 第二天史詩級進度 ═══
+    {title:'修復 TAB_MAP bug',desc:'系統架設分頁空白問題解決',priority:'p1',milestone:false,done:true,doneAt:'2026-04-24',site:'handbook'},
+    {title:'網址速查表可點擊',desc:'Ch1 13 個連結變成可點',priority:'p1',milestone:false,done:true,doneAt:'2026-04-24',site:'handbook'},
+    {title:'浮動導覽 widget 完成',desc:'右下紅+按鈕 6 網站跳轉',priority:'p1',milestone:false,done:true,doneAt:'2026-04-24',site:''},
+    {title:'素材包 × 2 打包',desc:'網站圖示.zip + Astra Design System v1.0',priority:'p1',milestone:false,done:true,doneAt:'2026-04-24',site:''},
+    {title:'Ch6 次數分級備份系統',desc:'🟢小改 / 🟡中改 / 🔴大改',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:'handbook'},
+    {title:'Ch7 AI 四件套 SOP',desc:'資料夾命名 / Commit / 電腦操作 / GitHub',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:'handbook'},
+    {title:'Ch10 AI Agent 指令模板',desc:'Lv1 助理 → Lv2 四件套 → Lv3 Agent',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:'handbook'},
+    {title:'Firebase Auth 帳號建立',desc:'ning030999@gmail.com · 兩專案共用',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:''},
+    {title:'Handbook V5 登入系統上架',desc:'完整 SaaS 雛形 · 登入鎖屏',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:'handbook'},
+    {title:'雲端日記系統',desc:'Build Log 分頁 · 6 種心情 · 永不消失',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:'handbook'},
+    {title:'私人密碼管理器',desc:'星號遮蓋 · 點擊顯示 · 一鍵複製',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:'handbook'},
+    {title:'Firebase 規則兩專案發布',desc:'lucky-handbook + script-generator 都鎖定',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:''},
+    {title:'Scripts V2 接 lucky-handbook',desc:'集中派戰略啟動 · 改連主資料庫',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:'scripts'},
+    {title:'Scripts V3 改用 v9 compat',desc:'解決登入共享問題 · 統一 SDK 版本',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:'scripts'},
+    {title:'Tasks V2 完整重寫',desc:'Firebase 雲端 + 里程碑時間軸 + 6 欄位新增',priority:'p0',milestone:true,done:true,doneAt:'2026-04-24',site:'tasks'},
+
+    // ═══ 待辦 · 明天要做 ═══
+    {title:'Handbook 新增 Ch11 Firebase SOP 章節',desc:'安全提示 + 規則位置 + 完整教學 · Lisa 說非常重要',priority:'p0',milestone:false,done:false,deadline:'2026-04-25',site:'handbook'},
+    {title:'Matrix / Brand / Home 三網站改造',desc:'加 Auth + 接 lucky-handbook 六網站全同步',priority:'p1',milestone:false,done:false,deadline:'2026-04-25',site:''},
+    {title:'Icon 方案 A + B 雙版本打包',desc:'ICS 前綴 vs 不加前綴 · 兩種都要',priority:'p1',milestone:false,done:false,deadline:'2026-04-25',site:''},
+    {title:'iPhone 桌面 icon 刷新',desc:'長按移除 → Safari 重新加到主畫面',priority:'p2',milestone:false,done:false,deadline:'2026-04-25',site:''},
+    {title:'base 原版打包（三網站）',desc:'handbook/scripts/tasks-base.html 放原始素材區',priority:'p2',milestone:false,done:false,deadline:'2026-04-25',site:''},
   ];
-  setSyncStatus('☁️ 首次初始化...');
+  setSyncStatus('☁️ 首次初始化 ' + seeds.length + ' 項...');
   const batch = [];
   seeds.forEach(function(seed){
     batch.push(db.collection('tasks').add({
@@ -575,7 +609,7 @@ function renderMilestones(){
     .sort(function(a,b){ return (b.doneAt || '').localeCompare(a.doneAt || ''); });
 
   if(milestones.length === 0){
-    timeline.innerHTML = '<div style="color:rgba(255,255,255,.6);font-size:12px;font-style:italic;text-align:center">還沒有里程碑 · 標記任務為里程碑就會出現在這</div>';
+    timeline.innerHTML = '<div style="color:var(--light);font-size:12px;font-style:italic;text-align:center;padding:20px">還沒有里程碑 · 標記任務為里程碑就會出現在這</div>';
     return;
   }
 
